@@ -10,7 +10,7 @@ func main() {
 	if len(os.Args) > 1 {
 		arg, err := strconv.ParseInt(os.Args[1], 10, 64)
 		if err != nil {
-            return
+			return
 		}
 		time.Sleep(time.Duration(arg) * time.Second)
 	}
