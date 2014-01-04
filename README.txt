@@ -11,6 +11,6 @@ Written in a simpler Plan9-like manner compared to what
 you might be used to.
 
 
-These work at least with Go1.1.
+These work at least with both Go1.1 and Go1.2.
 They are also currently unencumbered by licensing.
 
