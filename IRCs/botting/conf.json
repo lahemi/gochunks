@@ -1,0 +1,9 @@
+{
+    "Server": "irc.freenode.net",
+    "Port": "6667",
+    "Nick": "suchname",
+    "Channels": [
+        "#achannel",
+        "#anotherchannel"
+    ]
+}

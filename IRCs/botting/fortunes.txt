@@ -1,0 +1,28 @@
+And on the seventh day, God exited append mode.
+No beard grows on either the evil or the lazy.
+Emacs is good, but with Vim you can wash your clothes.
+Plan9 - more Unix than Unix itself.
+/sbin over /bin - static is the way to go. 
+Tables almighty.
+They say evil never sleeps. I sure am getting tired, though.
+You can get more with a kind word and a gun than just with a gun. -Not quite Al Capone
+IDEs are the new opiatic religion for the masses.
+/^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)([eE][+-]?[0-9]+)?$/ - numbers, you have been matched!
+xp for letters, dwElp for words.
+:w^M:! chmod 700 %^M^M do them permissions.
+:w^M:!%:p^M IDE, what IDE?
+Awk and Lua are the king and queen of scripting.
+Blessed be properly used goto!
+awk 'NR' == cat 
+awk '/pattern/ {print}' == grep
+awk 'BEGIN{for(i=1;i<ARGC;i++) printf(ARGV[i] \" "); print}' == echo
+awk '{if(NR<=n) print; else exit}' n=5 == head -n5 
+Society that would give up a little liberty to gain a little security deserves neither and will lose them both. -Benjamin Franklin
+Ever tried, ever failed. No matter. Try again, fail again. Fail better. -Samuel Beckett
+You cannot get a simple system by adding simplicity to a complex system.
+Any given country is just three missed meals away from revolutio
+Get on your knees and say hallelujah. You are about to receive a big mouthful of Heavenly love.
+Our cock of justice will make these cunts wet with the moist tears of regret.
+If you need to go to somewhere, goto is the way to go. -Ken Thompson
+The first 90 percent of the code accounts for the first 90 percent of the development time. The remaining 10 percent of the code accounts for the other 90 percent of the development time. -Tom Cargill
+There's nothing wrong with Java.  That a megavolcanic eruption under Oracle HQ couldn't solve. -ttmrichter
