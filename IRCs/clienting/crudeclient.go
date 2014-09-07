@@ -22,8 +22,18 @@ var (
 		"NICK",
 		"USER",
 	}
+
+	dataDir = os.Getenv("HOME") + "/.crude"
 )
 
+func checkDataDir() bool {
+	if f, e := os.Stat(dataDir); e != nil || !f.IsDir() {
+		return false
+	}
+	return true
+}
+
+// Not importing fmt keeps the binary smaller, but is silly.
 func stdout(s string) {
 	os.Stdout.Write([]byte(s + "\n"))
 }
@@ -56,7 +66,7 @@ func handleCmds(s string) bool {
 			writechan <- "QUIT"
 			os.Exit(0)
 		case "JOIN":
-			curTarget = s[5:] // Need a target list.
+			curTarget = s[5:]
 			fallthrough
 		case k:
 			return true
@@ -66,6 +76,13 @@ func handleCmds(s string) bool {
 }
 
 func main() {
+
+	if !checkDataDir() {
+		if e := os.Mkdir(dataDir, 0755); e != nil {
+			stderr("unable to create data dir")
+		}
+		stdout("Initialization, data|config dir " + dataDir + " created.")
+	}
 
 	var (
 		server = "irc.freenode.net"
