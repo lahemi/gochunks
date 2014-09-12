@@ -17,7 +17,7 @@ func main() {
 		frequency = 440.0
 		volume    = 32000.0
 		length    = num_samples
-        i int32
+		i         int32
 	)
 
 	for i = 0; i < length; i++ {

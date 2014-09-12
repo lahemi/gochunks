@@ -22,22 +22,22 @@ const Sample_per_sec = int32(44100)
 
 // http://www.topherlee.com/software/pcm-tut-wavformat.html
 type wav_header struct {
-	Riff_tag        [4]uint8    //1 - 4   "RIFF"  Marks the file as a riff file. Characters are each 1 byte long.
-	Riff_len        int32       //5 - 8   File size (integer) Size of the overall file - 8 bytes, in bytes (32-bit integer). Typically, you'd fill this in after creation.
-	Wave_tag        [4]uint8    //9 -12   "WAVE"  File Type Header. For our purposes, it always equals "WAVE".
-	Fmt_tag         [4]uint8    //13-16   "fmt "  Format chunk marker. Includes trailing null
-	Fmt_len         uint32      //17-20   16  Length of format data as listed above
-	Audio_fmt       uint16      //21-22   1   Type of format (1 is PCM) - 2 byte integer
-	Num_chans       uint16      //23-24   2   Number of Channels - 2 byte integer
-	Sample_rate     uint32      //25-28   44100   Sample Rate - 32 byte integer. Common values are 44100 (CD), 48000 (DAT). Sample Rate = Number of Samples per second, or Hertz.
-	Byte_rate       uint32      //29-32   176400  (Sample Rate * BitsPerSample * Channels) / 8.
-	Block_align     uint16      //33-34   4   (BitsPerSample * Channels) / 8.1 - 8 bit mono2 - 8 bit stereo/16 bit mono4 - 16 bit stereo
-	Bits_per_sample uint16      //35-36   16    bits per sample
-	Data_tag        [4]uint8    //37-40   "data" chunk header. Marks the beginning of the data section.
-	Data_len        uint32      //41-44   File size (data)    Size of the data section. 
+	Riff_tag        [4]uint8 //1 - 4   "RIFF"  Marks the file as a riff file. Characters are each 1 byte long.
+	Riff_len        int32    //5 - 8   File size (integer) Size of the overall file - 8 bytes, in bytes (32-bit integer). Typically, you'd fill this in after creation.
+	Wave_tag        [4]uint8 //9 -12   "WAVE"  File Type Header. For our purposes, it always equals "WAVE".
+	Fmt_tag         [4]uint8 //13-16   "fmt "  Format chunk marker. Includes trailing null
+	Fmt_len         uint32   //17-20   16  Length of format data as listed above
+	Audio_fmt       uint16   //21-22   1   Type of format (1 is PCM) - 2 byte integer
+	Num_chans       uint16   //23-24   2   Number of Channels - 2 byte integer
+	Sample_rate     uint32   //25-28   44100   Sample Rate - 32 byte integer. Common values are 44100 (CD), 48000 (DAT). Sample Rate = Number of Samples per second, or Hertz.
+	Byte_rate       uint32   //29-32   176400  (Sample Rate * BitsPerSample * Channels) / 8.
+	Block_align     uint16   //33-34   4   (BitsPerSample * Channels) / 8.1 - 8 bit mono2 - 8 bit stereo/16 bit mono4 - 16 bit stereo
+	Bits_per_sample uint16   //35-36   16    bits per sample
+	Data_tag        [4]uint8 //37-40   "data" chunk header. Marks the beginning of the data section.
+	Data_len        uint32   //41-44   File size (data)    Size of the data section.
 }
 
-var header         wav_header
+var header wav_header
 
 func Wav_open(filename string) *os.File {
 
@@ -68,9 +68,8 @@ func Wav_open(filename string) *os.File {
 	sp.Bits_per_sample = bitss
 	sp.Data_len = 0
 
-
 	//file, err := os.OpenFile(filename, os.O_RDWR, 0666)
-    file, err := os.Create(filename)
+	file, err := os.Create(filename)
 	if err != nil {
 		panic(err)
 	}
@@ -93,8 +92,8 @@ func Wav_close(file *os.File) {
 
 	fi, err := file.Stat()
 	if err != nil {
-        panic(err)
-    }
+		panic(err)
+	}
 	file_len := fi.Size()
 
 	data_len := file_len - int64(unsafe.Sizeof(header))
