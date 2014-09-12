@@ -21,7 +21,12 @@ IRCs
     A rough base for an IRC client.
 
 
+wavsy
 
-These work at least with both Go1.1 and Go1.2.
+    Wavsy itself is a meager little wav creation librar-ish.
+    Wavexample is a small example using the lib.
+
+
+These work at least with Go1.1-1.3.
 They are also currently unencumbered by licensing.
 
