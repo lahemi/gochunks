@@ -1,26 +1,17 @@
-// A little bit silly, and barebones .wav file creation functions:
-// Wav_open : which also creates the header.
-// Wav_write: which is just a wrap around file.Write([]byte)
-// Wav_close: which also checks the final filesize and
-//            places the correct size in the header.
-//
-// There are panics in the code, so if you want to use this as
-// a base for something properer, that'd be the place to start.
-//
-// There is also a neat little, unsafe, trick in Wav_open
-// for making your structs available as a []byte as well!
-//
-// 12-Sep-2014, Lauri Peltomäki
+// https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
+// http://www.topherlee.com/software/pcm-tut-wavformat.html
+// http://www3.nd.edu/~dthain/courses/cse20211/fall2013/wavfile/
 package wavsy
 
 import (
+	"bytes"
+	"encoding/binary"
 	"os"
 	"unsafe"
 )
 
 const Sample_per_sec = int32(44100)
 
-// http://www.topherlee.com/software/pcm-tut-wavformat.html
 type wav_header struct {
 	Riff_tag        [4]uint8 //1 - 4   "RIFF"  Marks the file as a riff file. Characters are each 1 byte long.
 	Riff_len        int32    //5 - 8   File size (integer) Size of the overall file - 8 bytes, in bytes (32-bit integer). Typically, you'd fill this in after creation.
@@ -81,10 +72,13 @@ func Wav_open(filename string) *os.File {
 	return file
 }
 
-// ..., maybe take a bytes.Buffer instead of
-// []byte and do the "conversion" here ?
-func Wav_write(file *os.File, data []byte) {
-	file.Write(data)
+// ...
+func Wav_write(file *os.File, data []int32) {
+	buf := new(bytes.Buffer)
+	for i := 0; i < len(data); i++ {
+		binary.Write(buf, binary.LittleEndian, data[i])
+	}
+	file.Write(buf.Bytes())
 }
 
 func Wav_close(file *os.File) {
