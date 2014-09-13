@@ -23,8 +23,13 @@ IRCs
 
 wavsy
 
-    Wavsy itself is a meager little wav creation librar-ish.
-    Wavexample is a small example using the lib.
+    - Wavsy itself is a meager little wav creation librar-ish.
+
+    - Wavexample is a small example using wavsy.
+
+    - Frequencisize is gives you frequencies of musical notes.
+
+    - Firstnotes uses both wavsy and frequencisize, in a little example.
 
 
 These work at least with Go1.1-1.3.
