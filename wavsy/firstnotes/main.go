@@ -1,4 +1,3 @@
-// Creates notes.wav, containing a few different notes.
 package main
 
 import (
@@ -8,6 +7,9 @@ import (
 )
 
 func main() {
+
+	//notelist := []string{"C4","D4","E4","A4","C5"}
+
 	// Because of the possibly uneven duration length, and int is a must.
 	odd := func(n float64) int32 {
 		if math.Mod(n, 1) != 0 && math.Mod(n, 0.5) == 0 {
@@ -16,7 +18,6 @@ func main() {
 		return int32(n)
 	}
 
-	//notelist := []string{"C4","D4","E4","A4","C5"}
 	var (
 		//frequs   = freqs.ByList(notelist)
 		// See comments on frequencisize.ByString
@@ -37,7 +38,7 @@ func main() {
 		}
 	}
 
-	file := wavsy.Wav_open("notes.wav")
-	wavsy.Wav_write(file, waveform)
-	wavsy.Wav_close(file)
+	file := wavsy.WavOpen("notes.wav")
+	wavsy.WavWrite(file, waveform)
+	wavsy.WavClose(file)
 }

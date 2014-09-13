@@ -22,7 +22,7 @@ func main() {
 		waveform = append(waveform, int32(volume*math.Sin(frequency*t*2.0*math.Pi)))
 	}
 
-	file := wavsy.Wav_open("sound.wav")
-	wavsy.Wav_write(file, waveform)
-	wavsy.Wav_close(file)
+	file := wavsy.WavOpen("sound.wav")
+	wavsy.WavWrite(file, waveform)
+	wavsy.WavClose(file)
 }

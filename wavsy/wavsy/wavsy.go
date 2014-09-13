@@ -30,8 +30,7 @@ type wav_header struct {
 
 var header wav_header
 
-func Wav_open(filename string) *os.File {
-
+func makeHeaderBase() []byte {
 	var (
 		srate = uint32(Sample_per_sec)
 		bitss = uint16(16)
@@ -59,13 +58,20 @@ func Wav_open(filename string) *os.File {
 	sp.Bits_per_sample = bitss
 	sp.Data_len = 0
 
+	return buf
+}
+
+func WavOpen(filename string) *os.File {
+
+	hdr := makeHeaderBase()
+
 	//file, err := os.OpenFile(filename, os.O_RDWR, 0666)
 	file, err := os.Create(filename)
 	if err != nil {
 		panic(err)
 	}
 
-	if _, err := file.Write(buf); err != nil {
+	if _, err := file.Write(hdr); err != nil {
 		panic(err)
 	}
 
@@ -73,7 +79,7 @@ func Wav_open(filename string) *os.File {
 }
 
 // ...
-func Wav_write(file *os.File, data []int32) {
+func WavWrite(file *os.File, data []int32) {
 	buf := new(bytes.Buffer)
 	for i := 0; i < len(data); i++ {
 		binary.Write(buf, binary.LittleEndian, data[i])
@@ -81,7 +87,7 @@ func Wav_write(file *os.File, data []int32) {
 	file.Write(buf.Bytes())
 }
 
-func Wav_close(file *os.File) {
+func WavClose(file *os.File) {
 	// not just close, but also set the size of the file appropriate
 
 	fi, err := file.Stat()
