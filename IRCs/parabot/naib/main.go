@@ -117,6 +117,8 @@ func handleBotCmds(s string) {
 			sendToCan(ml.Target, HELLO.Pick())
 		case linest == "emote":
 			sendToCan(ml.Target, EMOTES.Pick())
+		case linest == "nope":
+			sendToCan(ml.Target, NOPES.Pick())
 		case linest == "fortune":
 			fort := getFortune(fortuneFile)
 			if fort != "" {
