@@ -8,38 +8,20 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
-
-/*
-(
-    https?://
-    (?:www)?
-    [-~.\w]+
-    (:?
-        (?:
-            /[-+~%/.\w]*
-        )
-        (?:
-            /\??[-+=&;%@.\w]*
-        )*
-        (?:
-            #?[\.!/\\\w]*
-        )*
-    )?
-)
-*/
 
 var (
 	writechan = make(chan string, 512)
 	linerex   = regexp.MustCompile("^:[^ ]+?!([^ ]+? ){3}:.+")
 	urlrex    = regexp.MustCompile(
-		`^https?://(?:www)?[-~.\w]+(:?(?:/[-+~%/.\w]*)(?:\??[-+=&;%@.\w]*)*(?:#?[\.!/\\\w]*)*)?$`,
+		`^https?://(?:www)?[-~.\w]+(:?(?:/[-+~%/.\w]*)*(?:\??[-+=&;%@.\w]*)*(?:#?[-\.!/\\\w]*)*)?$`,
 	)
 	titlerex = regexp.MustCompile(`(?i:<title>(.*)</title>)`)
 
 	cmdPrefix = "˙"
 
-	overLord = "icelesstea"
+	overLord = "" // You
 
 	dataDir = os.Getenv("HOME") + "/.crude"
 
@@ -120,16 +102,22 @@ func handleBotCmds(s string) {
 	ml := splitMsgLine(s)
 
 	if ml.Nick == overLord && ml.Msg == cmdPrefix+"die" {
+		sendToCan(ml.Target, DIED.Pick())
+		// BAD, use a sync.WaitGroup maybe ?
+		time.Sleep(time.Duration(1) * time.Second)
 		writechan <- "QUIT"
 		os.Exit(0)
 	}
 
 	switch {
 	case strings.HasPrefix(ml.Msg, cmdPrefix):
-		switch ml.Msg[len(cmdPrefix):] {
-		case "hello":
-			sendToCan(ml.Target, "Beepboop")
-		case "fortune":
+		linest := ml.Msg[len(cmdPrefix):]
+		switch {
+		case linest == "hello":
+			sendToCan(ml.Target, HELLO.Pick())
+		case linest == "emote":
+			sendToCan(ml.Target, EMOTES.Pick())
+		case linest == "fortune":
 			fort := getFortune(fortuneFile)
 			if fort != "" {
 				sendToCan(ml.Target, fort)
