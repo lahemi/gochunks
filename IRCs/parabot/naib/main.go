@@ -19,7 +19,8 @@ var (
 	)
 	titlerex = regexp.MustCompile(`(?i:<title>(.*)</title>)`)
 
-	cmdPrefix = "˙"
+	cmdPrefix         = "˙"
+	interactCmdPrefix = "("
 
 	overLord = "" // You
 
@@ -126,6 +127,9 @@ func handleBotCmds(s string) {
 			}
 		}
 	default:
+		if !fetchTitleState {
+			return
+		}
 		if !strings.Contains(ml.Msg, "http") {
 			return
 		}
@@ -138,6 +142,11 @@ func handleBotCmds(s string) {
 			}
 		}
 	}
+}
+
+// See `interactivecmds.go`
+func handleInteractiveCmds(cmdline string) {
+	eval(parse(cmdline))
 }
 
 func main() {
@@ -200,6 +209,11 @@ func main() {
 			break
 		}
 		inp := input[:len(input)-1]
-		writechan <- inp
+		switch {
+		case strings.HasPrefix(inp, interactCmdPrefix):
+			handleInteractiveCmds(inp)
+		default:
+			writechan <- inp
+		}
 	}
 }
