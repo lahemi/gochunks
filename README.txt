@@ -39,6 +39,12 @@ brainfuck
     - Yes.
 
 
+bitap
+
+    http://en.wikipedia.org/wiki/Bitap_algorithm at least sort of
+    implemented in Go, as a way in trying to understand the algorithm.
+
+
 These work at least with Go1.1-1.3.
 They are also currently unencumbered by licensing.
 
