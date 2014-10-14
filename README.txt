@@ -18,10 +18,6 @@ IRCs
     - clienting
     A rough base for an IRC client.
 
-    - parabot
-    Much nicer IRC bot than the one in `botting`.
-    Uses goroutines, and is better thought out, too.
-
 
 wavsy
 
