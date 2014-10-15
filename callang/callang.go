@@ -8,11 +8,7 @@ import (
 	"strings"
 )
 
-/*
-x:4;y:5; f:{_1_2+}; f(x,y);
-x y +;
-*/
-
+// Limited selection of whites, as it acts as a separator, too.
 func isWhite(c string) bool {
 	switch c {
 	case " ", "\t", "\n":
@@ -29,35 +25,48 @@ func (s *Fstack) Push(f float64) {
 }
 func (s *Fstack) Pop() float64 {
 	if len((*s)) <= 0 {
-		return -0xffffffff
+		return -0xffffffff // pseudo-error
 	}
 	last := (*s)[len((*s))-1]
 	(*s) = (*s)[:len((*s))-1]
 	return last
 }
 
-type Operators struct {
-	TERM, ASSIGN string
+type Operators map[string]string
 
-	PLUS, MINUS string
-	TIMES, DIV  string
-	MOD         string
+var (
+	ops = Operators{
+		"TERM": ";", "ASSIGN": ":",
 
-	CMT string
-	VAR string
-}
+		"PLUS": "+", "MINUS": "-",
+		"TIMES": "×", "DIV": "÷",
+		"MOD": "%",
 
-func (o *Operators) IsArith(oper string) bool {
+		"ABS": "|", "NEG": "_",
+
+		"CMT": "Ð", "VAR": "'",
+	}
+)
+
+func (o Operators) IsArg2(oper string) bool {
 	switch oper {
-	case o.PLUS, o.MINUS, o.TIMES, o.DIV, o.MOD:
+	case o["PLUS"], o["MINUS"], o["TIMES"], o["DIV"], o["MOD"]:
 		return true
 	default:
 		return false
 	}
 }
-func (o *Operators) IsOp(oper string) bool {
+func (o Operators) IsArg1(oper string) bool {
+	switch oper {
+	case o["ABS"]:
+		return true
+	default:
+		return false
+	}
+}
+func (o Operators) IsOp(oper string) bool {
 	switch {
-	case o.IsArith(oper) || oper == o.VAR:
+	case o.IsArg1(oper) || o.IsArg2(oper) || oper == o["VAR"]:
 		return true
 	default:
 		return false
@@ -65,41 +74,34 @@ func (o *Operators) IsOp(oper string) bool {
 }
 
 // Feels foolish, got to check if there'd be a better way to do this.
-func (o *Operators) RunOp(oper string, a1, a2 float64) (ret float64) {
+func (o Operators) RunOp2(oper string, a1, a2 float64) (ret float64) {
 	switch oper {
-	case o.PLUS:
+	case o["PLUS"]:
 		ret = a1 + a2
-	case o.MINUS:
+	case o["MINUS"]:
 		ret = a1 - a2
-	case o.TIMES:
+	case o["TIMES"]:
 		ret = a1 * a2
-	case o.DIV:
+	case o["DIV"]:
 		ret = a1 / a2
-	case o.MOD:
+	case o["MOD"]:
 		ret = math.Mod(a1, a2)
 	default:
 		ret = -0xffffffff // A bad pseudo-error
 	}
 	return
 }
+func (o Operators) RunOp1(oper string, a1 float64) (ret float64) {
+	switch oper {
+	case o["ABS"]:
+		ret = math.Abs(a1)
+	default:
+		ret = -0xffffffff
+	}
+	return
+}
 
 type Env map[string]float64
-
-var (
-	ops = Operators{
-		TERM:   ";",
-		ASSIGN: ":",
-
-		PLUS:  "+",
-		MINUS: "-",
-		TIMES: "*",
-		DIV:   "/",
-		MOD:   "%",
-
-		CMT: "Ð",
-		VAR: "'",
-	}
-)
 
 const (
 	NL = "\n"
@@ -115,38 +117,61 @@ func execute(text string, env Env) string {
 		fstack = Fstack{}
 		buf    string
 	)
+	spl = append(spl, " ") // Adds a "terminating" whitespace
 
 	for i := 0; i < len(spl); i++ {
 		c := spl[i]
 		switch {
-		case c == ops.TERM || isWhite(c):
+		case c == ops["TERM"] || isWhite(c) || c == ops["VAR"]:
+			if strings.HasPrefix(buf, ops["NEG"]) {
+				buf = strings.Replace(buf, "_", "-", -1)
+			}
 			if num, err := strconv.ParseFloat(buf, 64); err == nil {
 				fstack.Push(num)
 			}
 			buf = ""
-		case c == ops.VAR:
-			buf = ""
-			for i++; i < len(spl); i++ {
-				c := spl[i]
-				if ops.IsOp(c) || isWhite(c) {
-					if f, ok := env[buf]; ok {
-						fstack.Push(f)
+
+			// VAR both terminates previous exp, and references a variable
+			if c == ops["VAR"] {
+				for i++; i < len(spl); i++ {
+					c := spl[i]
+					if ops.IsOp(c) || isWhite(c) {
+						if f, ok := env[buf]; ok {
+							fstack.Push(f)
+						}
+						if ops.IsOp(c) {
+							i--
+						}
+						buf = ""
+						break
 					}
-					if ops.IsOp(c) {
-						i--
-					}
-					buf = ""
-					break
+					buf += c
 				}
-				buf += c
 			}
-		case ops.IsOp(c):
+
+			// duplication, will change
+		case ops.IsArg1(c):
+			if len(fstack) < 1 {
+				return "insufficient stack"
+			}
+			a1 := fstack.Pop()
+
+			r := ops.RunOp1(c, a1)
+
+			if r == -0xffffffff {
+				return "error with operators"
+			}
+			fstack.Push(r)
+
+			buf = ""
+
+		case ops.IsArg2(c):
 			if len(fstack) < 2 {
-				return ""
+				return "insufficient stack"
 			}
 			a2, a1 := fstack.Pop(), fstack.Pop()
 
-			r := ops.RunOp(c, a1, a2)
+			r := ops.RunOp2(c, a1, a2)
 
 			if r == -0xffffffff {
 				return "error with operators"
@@ -161,7 +186,7 @@ func execute(text string, env Env) string {
 	}
 
 	if len(fstack) < 1 {
-		return "Insufficient stack"
+		return "insufficient stack"
 	}
 	return strconv.FormatFloat(fstack.Pop(), 'g', 4, 64)
 }
@@ -191,13 +216,18 @@ func constructEnv(text string) (string, Env) {
 			}
 
 		case INCOMP:
-			if c == ops.TERM {
+			if c == ops["TERM"] {
 				if v, ok := env[buf]; ok {
 					env[vbuf] = v
 				} else if buf == vbuf {
 					env[vbuf] = env[vbuf]
-				} else if num, err := strconv.ParseFloat(buf, 64); err == nil {
-					env[vbuf] = num
+				} else {
+					if strings.HasPrefix(buf, ops["NEG"]) {
+						buf = strings.Replace(buf, "_", "-", -1)
+					}
+					if num, err := strconv.ParseFloat(buf, 64); err == nil {
+						env[vbuf] = num
+					}
 				}
 				vbuf = ""
 				buf = ""
@@ -210,10 +240,10 @@ func constructEnv(text string) (string, Env) {
 			switch {
 			case isWhite(c) && buf == "":
 
-			case c == ops.CMT:
+			case c == ops["CMT"]:
 				state = INCMT
 
-			case c == ops.ASSIGN && buf != "":
+			case c == ops["ASSIGN"] && buf != "":
 				vbuf = buf
 				buf = ""
 				state = INCOMP
