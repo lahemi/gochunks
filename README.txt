@@ -35,6 +35,11 @@ brainfuck
     - Yes.
 
 
+callang
+
+    - WIP ad hoc ex tempore esolang I use with naib, my most recent IRC bot.
+
+
 bitap
 
     http://en.wikipedia.org/wiki/Bitap_algorithm at least sort of
