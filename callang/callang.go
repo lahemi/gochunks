@@ -8,63 +8,59 @@ import (
 	"strings"
 )
 
-type Operators map[string]string
+// different operator types
+const (
+	NOP     OPType = 0
+	SPECIAL OPType = iota
+	ONEARG
+	TWOARG
+	DYADIC
+	MULRET
+	VAR
+)
 
-// Got to come up with a cleaner scheme.
-// Maybe a sublists, so that operators
-// can be grouped according to type.
+type OPType int
+type OP struct {
+	Name string
+	Type OPType
+}
+type Operators map[string]OP
+
 var (
 	ops = Operators{
-		"TERM": ";", "ASSIGN": ":",
+		"TERM":   OP{";", SPECIAL},
+		"ASSIGN": OP{":", SPECIAL},
+		"PLUS":   OP{"+", TWOARG},
+		"MINUS":  OP{"-", TWOARG},
+		"TIMES":  OP{"×", TWOARG},
+		"DIV":    OP{"÷", TWOARG},
+		"MOD":    OP{"%", TWOARG},
+		"RSFT":   OP{"«", TWOARG},
+		"LSFT":   OP{"»", TWOARG},
 
-		"PLUS": "+", "MINUS": "-",
-		"TIMES": "×", "DIV": "÷",
-		"MOD": "%",
+		"ABS":   OP{"|", ONEARG},
+		"NEG":   OP{"_", SPECIAL},
+		"INDEX": OP{"ı", MULRET},
 
-		"ABS": "|", "NEG": "_",
-		"INDEX": "ı",
+		"CMT": OP{"Ð", SPECIAL},
+		"VAR": OP{"'", VAR},
 
-		"CMT": "Ð", "VAR": "'",
-
-		"REDUCE": "/",
+		"REDUCE": OP{"/", DYADIC},
 	}
 )
 
-func (o Operators) IsArg2(oper string) bool {
-	switch oper {
-	case o["PLUS"], o["MINUS"], o["TIMES"], o["DIV"], o["MOD"]:
-		return true
-	default:
-		return false
+func (o Operators) WhichType(oper string) OPType {
+	for _, v := range ops {
+		if v.Name == oper {
+			return v.Type
+		}
 	}
-}
-func (o Operators) IsArg1(oper string) bool {
-	switch oper {
-	case o["ABS"], o["INDEX"]:
-		return true
-	default:
-		return false
-	}
-}
-func (o Operators) IsDyadic(oper string) bool {
-	switch oper {
-	case o["REDUCE"]:
-		return true
-	default:
-		return false
-	}
-}
-func (o Operators) IsMulRet(oper string) bool {
-	switch oper {
-	case o["INDEX"]:
-		return true
-	default:
-		return false
-	}
+	return NOP
 }
 func (o Operators) IsOp(oper string) bool {
-	switch {
-	case o.IsArg1(oper) || o.IsArg2(oper) || o.IsDyadic(oper) || oper == o["VAR"]:
+	t := o.WhichType(oper)
+	switch t {
+	case ONEARG, TWOARG, DYADIC, MULRET, VAR:
 		return true
 	default:
 		return false
@@ -74,15 +70,15 @@ func (o Operators) IsOp(oper string) bool {
 // Feels foolish, got to check if there'd be a better way to do this.
 func (o Operators) RunOp2(oper string, a1, a2 float64) (ret float64) {
 	switch oper {
-	case o["PLUS"]:
+	case o["PLUS"].Name:
 		ret = a1 + a2
-	case o["MINUS"]:
+	case o["MINUS"].Name:
 		ret = a1 - a2
-	case o["TIMES"]:
+	case o["TIMES"].Name:
 		ret = a1 * a2
-	case o["DIV"]:
+	case o["DIV"].Name:
 		ret = a1 / a2
-	case o["MOD"]:
+	case o["MOD"].Name:
 		ret = math.Mod(a1, a2)
 	default:
 		ret = -0xffffffff // A bad pseudo-error
@@ -91,18 +87,17 @@ func (o Operators) RunOp2(oper string, a1, a2 float64) (ret float64) {
 }
 func (o Operators) RunOp1(oper string, a1 float64) (ret float64) {
 	switch oper {
-	case o["ABS"]:
+	case o["ABS"].Name:
 		ret = math.Abs(a1)
 	default:
 		ret = -0xffffffff
 	}
 	return
 }
-func (o Operators) Nop(oper string) {}
 
 func (o Operators) RunMulRet(oper string, a1 float64) (ret Fstack) {
 	switch oper {
-	case o["INDEX"]:
+	case o["INDEX"].Name:
 		var i float64 = 1
 		for ; i <= a1; i++ {
 			ret = append(ret, i)
@@ -115,7 +110,7 @@ func (o Operators) RunMulRet(oper string, a1 float64) (ret Fstack) {
 
 func (o Operators) RunDyadic(oper, argop string, args Fstack) (ret Fstack) {
 	switch oper {
-	case o["REDUCE"]:
+	case o["REDUCE"].Name:
 		var (
 			total float64 = args[0]
 		)
@@ -134,11 +129,11 @@ type Env map[string]Fstack
 
 func execute(text string) string {
 	const (
-		RD       = 0
-		INCMT    = 1
-		INCOMP   = 2
-		INVAR    = 4
-		INDYADIC = 8
+		RD = iota
+		INCMT
+		INCOMP
+		INVAR
+		INDYADIC
 	)
 	var (
 		env = make(Env)
@@ -166,7 +161,7 @@ func execute(text string) string {
 			}
 
 		case INCOMP:
-			if c == ops["TERM"] || isWhite(c) {
+			if c == ops["TERM"].Name || isWhite(c) {
 				env[buf] = env["_G"]
 				env["_G"] = Fstack{}
 				buf = ""
@@ -176,7 +171,7 @@ func execute(text string) string {
 			}
 
 		case INVAR:
-			if isWhite(c) || ops.IsOp(c) || c == ops["TERM"] {
+			if isWhite(c) || ops.IsOp(c) || c == ops["TERM"].Name {
 				if v, ok := env[buf]; ok {
 					t := env["_G"]
 					t = append(t, v...)
@@ -195,7 +190,7 @@ func execute(text string) string {
 			if ops.IsOp(c) {
 				t := env["_G"]
 				r := ops.RunDyadic(dyadicop, c, t)
-				t = append(t, r...)
+				t = r
 				env["_G"] = t
 			}
 			dyadicop = ""
@@ -205,11 +200,11 @@ func execute(text string) string {
 			switch {
 			case isWhite(c) && buf == "":
 
-			case c == ops["CMT"]:
+			case c == ops["CMT"].Name:
 				state = INCMT
 
-			case (isWhite(c) || ops.IsOp(c) || c == ops["TERM"]) && buf != "":
-				if strings.HasPrefix(buf, ops["NEG"]) {
+			case (isWhite(c) || ops.IsOp(c) || c == ops["TERM"].Name) && buf != "":
+				if strings.HasPrefix(buf, ops["NEG"].Name) {
 					buf = strings.Replace(buf, "_", "-", -1)
 				}
 				if isNum(buf) {
@@ -225,23 +220,23 @@ func execute(text string) string {
 					cp--
 				}
 
-			case c == ops["VAR"]:
+			case ops.WhichType(c) == VAR:
 				state = INVAR
 
-			case ops.IsDyadic(c):
+			case ops.WhichType(c) == DYADIC:
 				dyadicop = c
 				state = INDYADIC
 
-			case ops.IsArg1(c):
+			case ops.WhichType(c) == ONEARG || ops.WhichType(c) == MULRET:
 				t := env["_G"]
 				if len(t) < 1 {
 					return //"insufficient stack"
 				}
 				a1 := t.Pop()
 
-				if ops.IsMulRet(c) {
+				if ops.WhichType(c) == MULRET {
 					r := ops.RunMulRet(c, a1)
-					t = append(t, r...)
+					t = r
 				} else {
 					r := ops.RunOp1(c, a1)
 					if r == -0xffffffff {
@@ -252,7 +247,7 @@ func execute(text string) string {
 				env["_G"] = t
 				buf = ""
 
-			case ops.IsArg2(c):
+			case ops.WhichType(c) == TWOARG:
 				t := env["_G"]
 				if len(t) < 2 {
 					return //"insufficient stack"
@@ -268,7 +263,7 @@ func execute(text string) string {
 				env["_G"] = t
 				buf = ""
 
-			case c == ops["ASSIGN"]:
+			case c == ops["ASSIGN"].Name:
 				buf = "" // 1 2 3:var; handle this ?
 				state = INCOMP
 
