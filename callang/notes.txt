@@ -1,0 +1,54 @@
+Ð Not everything here is implemented, and things _will_ change.
+Ð Ð comment
+Ð _ negation, _3
+Ð +, -, ×, ÷, %
+Ð | abs, 4 |
+Ð « », << >>
+
+2 3 4 5     Ð to global fstack
+
+2 2 +
+5 3 ÷
+_4 |
+Ð etc, basic operators take two or one args, either
+Ð by popping them from global stack, specifically
+Ð popped from a named stack, or "cloning"
+Ð from a referenced named stack.
+
+1 2 3 :x    Ð fstack to x label in env
+
+'x          Ð ref
+
+2 2 :y
+
+'y +        Ð 2 + 2 to global stack
+
+'x /+       Ð 1 + 2 + 3 global stack
+
+'x /+ :z    Ð 1+2+3 to z
+
+Ð operator alone either pops one or two
+Ð floats from the stack, does its operation
+Ð and pushes the result to given stack
+Ð default being the global stack
+Ð newline or ; terminates a stack|expression
+
+Ð ı takes one arg, and which is used as the limit
+Ð returning a stack from 1 to the limit
+
+6 ı/×   Ð factorial of 6
+
+Ð / reduce
+Ð º apply
+Ð (operator) applies the operators func to preceeding
+Ð stack, taking the right most elem as an argument
+Ð if the operator needs two
+
+'x 5 º+ :x    Ð 1+5 2+5 3+5, x rebound to them
+'x 5 (+) :x
+
+Ð concat stacks
+'y 'x 'z :q     Ð 2 2 6 7 8 6 to q
+
+!x      Ð pop one elem from x
+2 @ x   Ð push 2 to x
