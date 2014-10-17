@@ -18,6 +18,9 @@ const (
 	VAR
 )
 
+type Env map[string]Fstack
+type FunEnv map[string]string
+
 type OPType int
 type OP struct {
 	Name string
@@ -40,6 +43,7 @@ var (
 		"ABS":   OP{"|", ONEARG},
 		"NEG":   OP{"_", SPECIAL},
 		"INDEX": OP{"ı", MULRET},
+		"DROP":  OP{"!", SPECIAL},
 
 		"VAR": OP{"'", VAR},
 		"CMT": OP{"Ð", SPECIAL},
@@ -49,6 +53,10 @@ var (
 
 		"PRINT":      OP{",", SPECIAL},
 		"PRINTSTACK": OP{"ß", SPECIAL},
+
+		"FUNSTART": OP{"(", SPECIAL},
+		"FUNEND":   OP{")", SPECIAL},
+		"FUNNAME":  OP{"=", SPECIAL},
 	}
 )
 
@@ -149,8 +157,6 @@ func (o Operators) RunDyadic(oper, argop string, args Fstack) (ret Fstack) {
 	return
 }
 
-type Env map[string]Fstack
-
 // So monolithic...
 func execute(text string) {
 	const (
@@ -159,14 +165,17 @@ func execute(text string) {
 		INCOMP
 		INVAR
 		INDYADIC
+		INFUN
 	)
 	var (
-		env = make(Env)
-		spl = strings.Split(text, "") // To get UTF-8 chars
+		env  = make(Env)
+		fenv = make(FunEnv)
+		spl  = strings.Split(text, "") // To get UTF-8 chars
 
 		parseloop func(int, int)
 
 		buf      string
+		ebuf     string
 		dyadicop string
 	)
 	spl = append(spl, " ") // A "terminating" whitespace
@@ -195,18 +204,39 @@ func execute(text string) {
 				buf += c
 			}
 
+		case INFUN:
+			switch {
+			case c == ops["FUNEND"].Name:
+				fenv[buf] = ebuf
+				ebuf = ""
+				buf = ""
+				state = RD
+			case c == ops["FUNNAME"].Name:
+				ebuf = buf
+				buf = ""
+			default:
+				buf += c
+			}
+
 		case INVAR:
 			if isWhite(c) || ops.IsOp(c) || c == ops["TERM"].Name {
 				if v, ok := env[buf]; ok {
 					t := env["_G"]
 					t = append(t, v...)
 					env["_G"] = t
+					if ops.IsOp(c) {
+						cp--
+					}
+				} else if v, ok := fenv[buf]; ok {
+					// A bit unclear. Substition model.
+					vs := strings.Split(v, "")
+					tt := spl[cp:]
+					vs = append(vs, tt...)
+					spl = vs
+					cp = -1 // Because of parseloop((cp+1), state)
 				}
 				buf = ""
 				state = RD
-				if ops.IsOp(c) {
-					cp--
-				}
 			} else {
 				buf += c
 			}
@@ -246,11 +276,16 @@ func execute(text string) {
 				}
 
 			case ops.WhichType(c) == VAR:
+				buf = ""
 				state = INVAR
 
 			case ops.WhichType(c) == DYADIC:
 				dyadicop = c
 				state = INDYADIC
+
+			case c == ops["FUNSTART"].Name:
+				buf = ""
+				state = INFUN
 
 			case ops.WhichType(c) == ONEARG || ops.WhichType(c) == MULRET:
 				t := env["_G"]
@@ -303,13 +338,20 @@ func execute(text string) {
 			case c == ops["PRINTSTACK"].Name:
 				fmt.Print(env["_G"])
 
+			case c == ops["DROP"].Name:
+				t := env["_G"]
+				if len(t) < 1 {
+					fmt.Print("insufficient stack")
+					return
+				}
+				t.Pop()
+				env["_G"] = t
+
 			default:
 				buf += c
 			}
 		}
-
-		cp++
-		parseloop(cp, state)
+		parseloop((cp + 1), state)
 	}
 	parseloop(0, RD)
 }

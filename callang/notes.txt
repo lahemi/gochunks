@@ -22,7 +22,7 @@ _4 |
 
 'x          Ð ref, without modifying x
 
-2 2 :y
+2 2 :y      Ð binding also clears the "global" area
 
 'y +        Ð 2 + 2 to global stack
 
@@ -32,9 +32,7 @@ _4 |
 
 Ð operator alone either pops one or two
 Ð floats from the stack, does its operation
-Ð and pushes the result to given stack
-Ð default being the global stack
-Ð newline or ; terminates a stack|expression
+Ð and pushes the result to the global stack
 
 Ð ı takes one arg, and which is used as the limit
 Ð returning a stack from 1 to the limit
@@ -48,5 +46,44 @@ _4 |
 Ð concat stacks
 'y 'x 'z :q     Ð 2 2 6 7 8 6 to q
 
-x!      Ð pop one elem from x
-2 @ x   Ð push 2 to x
+'x ! :x  Ð pop one elem from x
+'x 2 :x  Ð pushes 2 to x
+
+5ı :arr         Ð 1 2 3 4 5 to arr
+'arr ß ! :arr   Ð arr to "global" area, print it all, pop one elem, and rebind
+'arr ß          Ð show the result of the pop
+
+Ð functions
+Ð (body=name) 'name
+
+(ß=show) (º!=empty) (ı/×=fact)
+
+1 2 3 'show 'empty
+6 'fact 'show
+
+(1 2 3=nums)
+
+'nums 'show     Ð prints 1 2 3
+
+
+Ð basic stack manipulation as in FORTH:
+Ð       DUP, SWAP, OVER, ROT, PICK, (we have DROP already)
+Ð
+Ð reverse
+Ð
+Ð more maths: 
+Ð       ceil & floor
+Ð       and, or, not
+Ð       < > =
+Ð       power, root (square ², cubic ³)
+Ð       random
+Ð       constants: PI, ...
+Ð
+Ð conditionals ?
+Ð
+Ð 1 2 + -> a1:=1 a2:=2; should change to other way around
+Ð so that it'd  be more strictly in order, resembling a stack ?
+Ð
+Ð a special hidden stack, where you can store things temporarily ?
+Ð ie. 1 2 3 4 :x 'x [hide] ! [unhide] :x -> 1 2 4
+Ð
