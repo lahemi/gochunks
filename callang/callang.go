@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"math"
-	"strconv"
 	"strings"
 )
 
@@ -35,17 +34,21 @@ var (
 		"TIMES":  OP{"×", TWOARG},
 		"DIV":    OP{"÷", TWOARG},
 		"MOD":    OP{"%", TWOARG},
-		"RSFT":   OP{"«", TWOARG},
-		"LSFT":   OP{"»", TWOARG},
+		"RSFT":   OP{"»", TWOARG},
+		"LSFT":   OP{"«", TWOARG},
 
 		"ABS":   OP{"|", ONEARG},
 		"NEG":   OP{"_", SPECIAL},
 		"INDEX": OP{"ı", MULRET},
 
-		"CMT": OP{"Ð", SPECIAL},
 		"VAR": OP{"'", VAR},
+		"CMT": OP{"Ð", SPECIAL},
 
 		"REDUCE": OP{"/", DYADIC},
+		"APPLY":  OP{"º", DYADIC},
+
+		"PRINT":      OP{",", SPECIAL},
+		"PRINTSTACK": OP{"ß", SPECIAL},
 	}
 )
 
@@ -80,6 +83,11 @@ func (o Operators) RunOp2(oper string, a1, a2 float64) (ret float64) {
 		ret = a1 / a2
 	case o["MOD"].Name:
 		ret = math.Mod(a1, a2)
+		// These seem to give somewhat dubious results
+	case o["RSFT"].Name:
+		ret = float64(uint(a1) >> uint(a2))
+	case o["LSFT"].Name:
+		ret = float64(uint(a1) << uint(a2))
 	default:
 		ret = -0xffffffff // A bad pseudo-error
 	}
@@ -111,13 +119,29 @@ func (o Operators) RunMulRet(oper string, a1 float64) (ret Fstack) {
 func (o Operators) RunDyadic(oper, argop string, args Fstack) (ret Fstack) {
 	switch oper {
 	case o["REDUCE"].Name:
-		var (
-			total float64 = args[0]
-		)
+		var total float64 = args[0]
 		for c := 1; c < len(args); c++ {
 			total = o.RunOp2(argop, total, args[c])
 		}
 		ret = Fstack{total}
+
+	case o["APPLY"].Name:
+		if len(args) < 2 {
+			return args
+		}
+		switch o.WhichType(argop) {
+		case TWOARG:
+			applyarg := args.Pop()
+			for i := 0; i < len(args); i++ {
+				ret = append(ret, o.RunOp2(argop, applyarg, args[i]))
+			}
+		case ONEARG:
+			for i := 0; i < len(args); i++ {
+				ret = append(ret, o.RunOp1(argop, args[i]))
+			}
+		default:
+			ret = Fstack{}
+		}
 
 	default:
 		ret = Fstack{}
@@ -127,7 +151,8 @@ func (o Operators) RunDyadic(oper, argop string, args Fstack) (ret Fstack) {
 
 type Env map[string]Fstack
 
-func execute(text string) string {
+// So monolithic...
+func execute(text string) {
 	const (
 		RD = iota
 		INCMT
@@ -267,6 +292,17 @@ func execute(text string) string {
 				buf = "" // 1 2 3:var; handle this ?
 				state = INCOMP
 
+			case c == ops["PRINT"].Name:
+				t := env["_G"]
+				if len(t) < 1 {
+					fmt.Print("insufficient stack")
+					return
+				}
+				fmt.Print(t[len(t)-1])
+
+			case c == ops["PRINTSTACK"].Name:
+				fmt.Print(env["_G"])
+
 			default:
 				buf += c
 			}
@@ -276,12 +312,6 @@ func execute(text string) string {
 		parseloop(cp, state)
 	}
 	parseloop(0, RD)
-
-	t := env["_G"]
-	if len(t) < 1 {
-		return "insufficient stack"
-	}
-	return strconv.FormatFloat(t.Pop(), 'g', 4, 64)
 }
 
 var input string
@@ -295,5 +325,5 @@ func main() {
 	if input == "" {
 		return
 	}
-	fmt.Print(execute(input))
+	execute(input)
 }

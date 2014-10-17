@@ -4,6 +4,9 @@
 Ð +, -, ×, ÷, %
 Ð | abs, 4 |
 Ð « », << >>
+Ð
+Ð , prints the top-most elem of the global stack
+Ð ß prints the whole stack. neither modifies the stack
 
 2 3 4 5     Ð to global fstack
 
@@ -17,7 +20,7 @@ _4 |
 
 1 2 3 :x    Ð fstack to x label in env
 
-'x          Ð ref
+'x          Ð ref, without modifying x
 
 2 2 :y
 
@@ -35,20 +38,15 @@ _4 |
 
 Ð ı takes one arg, and which is used as the limit
 Ð returning a stack from 1 to the limit
+Ð / reduce
+Ð º apply
 
 6 ı/×   Ð factorial of 6
 
-Ð / reduce
-Ð º apply
-Ð (operator) applies the operators func to preceeding
-Ð stack, taking the right most elem as an argument
-Ð if the operator needs two
-
-'x 5 º+ :x    Ð 1+5 2+5 3+5, x rebound to them
-'x 5 (+) :x
+'x 5 º+   Ð 1+5 2+5 3+5
 
 Ð concat stacks
 'y 'x 'z :q     Ð 2 2 6 7 8 6 to q
 
-!x      Ð pop one elem from x
+x!      Ð pop one elem from x
 2 @ x   Ð push 2 to x
