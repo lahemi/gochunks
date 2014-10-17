@@ -1,89 +1,92 @@
-Ð Not everything here is implemented, and things _will_ change.
-Ð Ð comment
-Ð _ negation, _3
-Ð +, -, ×, ÷, %
-Ð | abs, 4 |
-Ð « », << >>
-Ð
-Ð , prints the top-most elem of the global stack
-Ð ß prints the whole stack. neither modifies the stack
+Ħ Not everything here is implemented, and things _will_ change.
+Ħ Ħ comment
+Ħ _ negation, _3
+Ħ +, -, ×, ÷, %
+Ħ | abs, 4 |
+Ħ « », << >>
+Ħ ⌈, ⌊ 
+Ħ
+Ħ , prints the top-most elem of the global stack
+Ħ ß prints the whole stack. neither modifies the stack
 
-2 3 4 5     Ð to global fstack
+2 3 4 5     Ħ to global fstack
 
 2 2 +
 5 3 ÷
 _4 |
-Ð etc, basic operators take two or one args, either
-Ð by popping them from global stack, specifically
-Ð popped from a named stack, or "cloning"
-Ð from a referenced named stack.
+Ħ etc, basic operators take two or one args, either
+Ħ by popping them from global stack, specifically
+Ħ popped from a named stack, or "cloning"
+Ħ from a referenced named stack.
 
-1 2 3 :x    Ð fstack to x label in env
+1 2 3 :x    Ħ fstack to x label in env
 
-'x          Ð ref, without modifying x
+'x          Ħ ref, without modifying x
 
-2 2 :y      Ð binding also clears the "global" area
+2 2 :y      Ħ binding also clears the "global" area
 
-'y +        Ð 2 + 2 to global stack
+'y +        Ħ 2 + 2 to global stack
 
-'x /+       Ð 1 + 2 + 3 global stack
+'x /+       Ħ 1 + 2 + 3 global stack
 
-'x /+ :z    Ð 1+2+3 to z
+'x /+ :z    Ħ 1+2+3 to z
 
-Ð operator alone either pops one or two
-Ð floats from the stack, does its operation
-Ð and pushes the result to the global stack
+Ħ operator alone either pops one or two
+Ħ floats from the stack, does its operation
+Ħ and pushes the result to the global stack
 
-Ð ı takes one arg, and which is used as the limit
-Ð returning a stack from 1 to the limit
-Ð / reduce
-Ð º apply
+Ħ ı takes one arg, and which is used as the limit
+Ħ returning a stack from 1 to the limit
+Ħ / reduce
+Ħ º apply
 
-6 ı/×   Ð factorial of 6
+6 ı/×   Ħ factorial of 6
 
-'x 5 º+   Ð 1+5 2+5 3+5
+'x 5 º+   Ħ 1+5 2+5 3+5
 
-Ð concat stacks
-'y 'x 'z :q     Ð 2 2 6 7 8 6 to q
+Ħ concat stacks
+'y 'x 'z :q     Ħ 2 2 6 7 8 6 to q
 
-'x ! :x  Ð pop one elem from x
-'x 2 :x  Ð pushes 2 to x
+'x Ð :x  Ħ pop one elem from x
+'x 2 :x  Ħ pushes 2 to x
 
-5ı :arr         Ð 1 2 3 4 5 to arr
-'arr ß ! :arr   Ð arr to "global" area, print it all, pop one elem, and rebind
-'arr ß          Ð show the result of the pop
+5ı :arr         Ħ 1 2 3 4 5 to arr
+'arr ß ! :arr   Ħ arr to "global" area, print it all, pop one elem, and rebind
+'arr ß          Ħ show the result of the pop
 
-Ð functions
-Ð (body=name) 'name
+Ħ functions
+Ħ (body ← name) 'name
+Ħ the whitespaces are optional
 
-(ß=show) (º!=empty) (ı/×=fact)
+(ß ← show) (º! ← empty) (ı/× ← fact)
 
 1 2 3 'show 'empty
 6 'fact 'show
 
-(1 2 3=nums)
+(1 2 3 ← nums)
 
-'nums 'show     Ð prints 1 2 3
+'nums 'show     Ħ prints 1 2 3
+
+Ħ ↑ ↓ hide and unhide
+Ħ you can tuck away numbers into a special purpose stack
+
+5ı ↑ Ð ↓ ß      Ħ prints 1 2 3 5
 
 
-Ð basic stack manipulation as in FORTH:
-Ð       DUP, SWAP, OVER, ROT, PICK, (we have DROP already)
-Ð
-Ð reverse
-Ð
-Ð more maths: 
-Ð       ceil & floor
-Ð       and, or, not
-Ð       < > =
-Ð       power, root (square ², cubic ³)
-Ð       random
-Ð       constants: PI, ...
-Ð
-Ð conditionals ?
-Ð
-Ð 1 2 + -> a1:=1 a2:=2; should change to other way around
-Ð so that it'd  be more strictly in order, resembling a stack ?
-Ð
-Ð a special hidden stack, where you can store things temporarily ?
-Ð ie. 1 2 3 4 :x 'x [hide] ! [unhide] :x -> 1 2 4
-Ð
+Ħ basic stack manipulation as in FORTH:
+Ħ       DUP, SWAP, OVER, ROT, PICK, (we have DROP already)
+Ħ
+Ħ reverse
+Ħ
+Ħ more maths: 
+Ħ       and, or, not
+Ħ       < > =
+Ħ       power, root (square ², cubic ³)
+Ħ       random
+Ħ       constants: PI, ...
+Ħ
+Ħ conditionals ?
+Ħ
+Ħ 1 2 + -> a1:=1 a2:=2; should change to other way around
+Ħ so that it'd  be more strictly in order, resembling a stack ?
+Ħ

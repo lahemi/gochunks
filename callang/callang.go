@@ -37,16 +37,19 @@ var (
 		"TIMES":  OP{"×", TWOARG},
 		"DIV":    OP{"÷", TWOARG},
 		"MOD":    OP{"%", TWOARG},
-		"RSFT":   OP{"»", TWOARG},
-		"LSFT":   OP{"«", TWOARG},
+		// These two do not really work prorerly.
+		"RSFT": OP{"»", TWOARG},
+		"LSFT": OP{"«", TWOARG},
 
 		"ABS":   OP{"|", ONEARG},
+		"CEIL":  OP{"⌈", ONEARG},
+		"FLOOR": OP{"⌊", ONEARG},
 		"NEG":   OP{"_", SPECIAL},
 		"INDEX": OP{"ı", MULRET},
-		"DROP":  OP{"!", SPECIAL},
+		"DROP":  OP{"Ð", SPECIAL},
 
 		"VAR": OP{"'", VAR},
-		"CMT": OP{"Ð", SPECIAL},
+		"CMT": OP{"Ħ", SPECIAL},
 
 		"REDUCE": OP{"/", DYADIC},
 		"APPLY":  OP{"º", DYADIC},
@@ -56,7 +59,10 @@ var (
 
 		"FUNSTART": OP{"(", SPECIAL},
 		"FUNEND":   OP{")", SPECIAL},
-		"FUNNAME":  OP{"=", SPECIAL},
+		"FUNNAME":  OP{"←", SPECIAL},
+
+		"HIDE":   OP{"↑", SPECIAL},
+		"UNHIDE": OP{"↓", SPECIAL},
 	}
 )
 
@@ -105,6 +111,10 @@ func (o Operators) RunOp1(oper string, a1 float64) (ret float64) {
 	switch oper {
 	case o["ABS"].Name:
 		ret = math.Abs(a1)
+	case o["CEIL"].Name:
+		ret = math.Ceil(a1)
+	case o["FLOOR"].Name:
+		ret = math.Floor(a1)
 	default:
 		ret = -0xffffffff
 	}
@@ -180,6 +190,7 @@ func execute(text string) {
 	)
 	spl = append(spl, " ") // A "terminating" whitespace
 	env["_G"] = Fstack{}
+	env["_H"] = Fstack{}
 
 	parseloop = func(cp, state int) {
 		if cp >= len(spl) {
@@ -207,6 +218,7 @@ func execute(text string) {
 		case INFUN:
 			switch {
 			case c == ops["FUNEND"].Name:
+				buf = strings.TrimSpace(buf)
 				fenv[buf] = ebuf
 				ebuf = ""
 				buf = ""
@@ -287,10 +299,33 @@ func execute(text string) {
 				buf = ""
 				state = INFUN
 
+			case c == ops["HIDE"].Name:
+				if len(env["_G"]) < 1 {
+					fmt.Print("insufficient stack")
+					return
+				}
+				t := env["_G"]
+				h := env["_H"]
+				h.Push(t.Pop())
+				env["_G"] = t
+				env["_H"] = h
+
+			case c == ops["UNHIDE"].Name:
+				if len(env["_H"]) < 1 {
+					fmt.Print("insufficient stack")
+					return
+				}
+				t := env["_G"]
+				h := env["_H"]
+				t.Push(h.Pop())
+				env["_G"] = t
+				env["_H"] = h
+
 			case ops.WhichType(c) == ONEARG || ops.WhichType(c) == MULRET:
 				t := env["_G"]
 				if len(t) < 1 {
-					return //"insufficient stack"
+					fmt.Print("insufficient stack")
+					return
 				}
 				a1 := t.Pop()
 
@@ -310,7 +345,8 @@ func execute(text string) {
 			case ops.WhichType(c) == TWOARG:
 				t := env["_G"]
 				if len(t) < 2 {
-					return //"insufficient stack"
+					fmt.Print("insufficient stack")
+					return
 				}
 				a2, a1 := t.Pop(), t.Pop()
 
