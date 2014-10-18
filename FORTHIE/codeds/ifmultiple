@@ -1,0 +1,20 @@
+:
+MULTESTS
+    INT
+    DUP DUP
+    2 =
+    SWAP
+    2 > OR IF
+        STRING "yey" PRINT
+        INT 4 = IF
+            STRING "even" PRINT
+        ELSE
+            STRING "odd" PRINT
+        END
+    ELSE
+        STRING "nope" PRINT
+    END
+;
+
+INT 4 MULTEST
+

@@ -1,0 +1,9 @@
+: SQUARE DUP × ;
+: HALF 2 ÷ ;
+: ONEANDHALF SQUARE HALF ;
+
+INT
+
+8 ONEANDHALF
+
+.S

@@ -40,6 +40,12 @@ callang
     - WIP ad hoc ex tempore esolang I use with naib, my most recent IRC bot.
 
 
+FORTHIE
+
+    - A sort of mini-FORTH, still incomplete, compiling words works,
+      but need to add more basic words, and finish branching.
+
+
 bitap
 
     http://en.wikipedia.org/wiki/Bitap_algorithm at least sort of

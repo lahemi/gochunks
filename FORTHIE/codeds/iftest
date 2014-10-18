@@ -1,0 +1,5 @@
+INT 3 4 = IF
+    STRING "even" PRINT
+ELSE
+    STRING "odd" PRINT
+END 
