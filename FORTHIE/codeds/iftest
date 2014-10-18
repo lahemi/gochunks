@@ -1,5 +1,29 @@
-INT 3 4 = IF
-    STRING "even" PRINT
+INT 1 IF
+    5
+END
+
+0 IF
+    0
+END
+
 ELSE
-    STRING "odd" PRINT
-END 
+    1 2 3 .S
+    "this stuff will never be eval'd"
+END
+
+8
+
+0 IF
+    0
+ELSE
+    2 3 4 .S
+END
+
+1 IF
+    123
+ELSE
+    3 4 5 .S
+END
+
+.S
+

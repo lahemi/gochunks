@@ -1,0 +1,25 @@
+
+INT 1 IF
+    1
+    0 IF
+        2
+    ELSE
+        3
+    END
+END
+
+.S
+
+0 IF
+    1
+ELSE
+    2
+    1 IF
+        3
+    ELSE
+        4
+    END
+END
+
+.S
+

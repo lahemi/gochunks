@@ -45,7 +45,7 @@ func whichType(el string) (typ IDTYPE) {
 		typ = INUM
 	case isFloat(el):
 		typ = FNUM
-	case isString(el):
+	case isString(el): // doesn't work proper
 		typ = STR
 	case el == ":":
 		typ = ASSIGN
@@ -69,8 +69,8 @@ func findBranchEnd(startpoint int, elems []ELEM) int {
 		if elems[i].Type == TESTBRANCH {
 			brcount++
 		}
-		if elems[i].Type == BRANCHEND {
-			if brcount == 0 {
+		if elems[i].Type == BRANCHEND || elems[i].Type == BRANCH {
+			if brcount <= 0 {
 				return i
 			}
 			brcount--
@@ -79,6 +79,7 @@ func findBranchEnd(startpoint int, elems []ELEM) int {
 	return -1 // Not found !
 }
 
+// handle STRINGs properly
 func untypeds(text string) (ret []string) {
 	var (
 		buf string
@@ -217,7 +218,21 @@ func eval(code []ELEM, env ENV) {
 			} else {
 				return
 			}
-		// BRANCH, TESTBRANCH, BRANCHEND
+		case TESTBRANCH:
+			testarg := env.INTS.Pop()
+			branchend := findBranchEnd(cp, code)
+			if testarg == 0 {
+				if branchend != -1 {
+					cp = branchend
+				}
+			}
+		case BRANCH:
+			branchend := findBranchEnd((cp + 1), code)
+			if branchend != -1 {
+				cp = branchend
+			}
+		case BRANCHEND:
+			// nothing to do here, skip.
 		default:
 			return
 		}
