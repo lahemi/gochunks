@@ -8,7 +8,7 @@ INT 1 IF
     END
 END
 
-.S
+.S NL
 
 0 IF
     1
@@ -21,5 +21,5 @@ ELSE
     END
 END
 
-.S
+.S NL
 

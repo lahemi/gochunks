@@ -7,7 +7,7 @@ END
 END
 
 ELSE
-    1 2 3 .S
+    1 2 3 .S NL
     "this stuff will never be eval'd"
 END
 
@@ -16,7 +16,7 @@ END
 0 IF
     0
 ELSE
-    2 3 4 .S
+    2 3 4 .S NL
 END
 
 1 IF
@@ -25,5 +25,5 @@ ELSE
     3 4 5 .S
 END
 
-.S
+.S NL
 

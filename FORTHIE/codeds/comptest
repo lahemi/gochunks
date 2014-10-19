@@ -1,0 +1,15 @@
+INT 1 1 = IF
+    0
+END
+
+1 2 < IF
+    1
+END
+
+3 5 ≥ IF
+    2
+ELSE
+    3
+END
+
+.S NL

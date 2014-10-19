@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -45,7 +46,7 @@ func whichType(el string) (typ IDTYPE) {
 		typ = INUM
 	case isFloat(el):
 		typ = FNUM
-	case isString(el): // doesn't work proper
+	case isString(el):
 		typ = STR
 	case el == ":":
 		typ = ASSIGN
@@ -82,14 +83,23 @@ func findBranchEnd(startpoint int, elems []ELEM) int {
 // handle STRINGs properly
 func untypeds(text string) (ret []string) {
 	var (
-		buf string
-		spl = strings.Split(text, "")
+		buf     string
+		compstr = false
+		spl     = strings.Split(text, "")
 	)
 	spl = append(spl, " ") // A "terminating" whitespace.
 	for tp := 0; tp < len(spl); tp++ {
 		switch {
 		case isWhite(spl[tp]) && buf == "":
-		case isWhite(spl[tp]) && buf != "":
+		case spl[tp] == `"` && buf == "":
+			compstr = true
+			buf += spl[tp]
+		case compstr && spl[tp] == `"` && spl[tp-1] != `\`:
+			compstr = false
+			buf += spl[tp]
+			ret = append(ret, buf)
+			buf = ""
+		case !compstr && isWhite(spl[tp]) && buf != "":
 			ret = append(ret, buf)
 			buf = ""
 		default:
@@ -251,15 +261,26 @@ func readText(file string) string {
 	return string(cnt)
 }
 
+var showastree bool
+
+func init() {
+	flag.BoolVar(&showastree, "a", false, `Prints out the ast "tree" of given code.`)
+	flag.Parse()
+}
+
 func main() {
-	cptest := createASTree(untypeds(readText(os.Args[1])))
+	cptest := createASTree(untypeds(readText(flag.Arg(0))))
 	compile(cptest)
-	for id, c := range IDENTS {
-		fmt.Println(id)
-		printASTree(c)
-	}
 	els := removeComps(cptest)
-	fmt.Println()
-	printASTree(els)
+
+	if showastree {
+		for id, c := range IDENTS {
+			fmt.Println(id)
+			printASTree(c)
+		}
+		fmt.Println()
+		printASTree(els)
+	}
+
 	eval(els, GENV)
 }
