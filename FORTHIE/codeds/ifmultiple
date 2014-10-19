@@ -4,7 +4,7 @@ MULTESTS
     DUP DUP
     2 =
     SWAP
-    2 > OR IF
+    2 > ∨ IF
         STRING "yey" PRINT NL
         INT 4 = IF
             STRING "even" PRINT NL
@@ -16,5 +16,7 @@ MULTESTS
     END
 ;
 
-INT 4 MULTEST
+INT 4
+MULTEST .S NL
+
 

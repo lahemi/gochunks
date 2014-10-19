@@ -1,0 +1,36 @@
+STRING "Logical ∧(and) and ∨(or) and ~(not)." PRINT NL
+
+STRING "1 1 = 4 5 < ∧" PRINT NL
+INT 1 1 = 4 5 < ∧ IF
+    STRING "AND!" PRINT NL
+END
+STRING "1 1 = 4 5 = ∧" PRINT NL
+INT 1 1 = 4 5 = ∧ IF
+    STRING "AND!" PRINT NL
+ELSE
+    STRING "No and.." PRINT NL
+END
+
+STRING "1 1 ≠ 5 4 > ∨" PRINT NL
+INT 1 1 ≠ 5 4 > ∨ IF
+    STRING "OR!" PRINT NL
+END
+STRING "1 2 = 4 2 + ∨" PRINT NL
+INT 1 2 = 4 2 + ∨ IF
+    STRING "OR!" PRINT NL
+ELSE
+    STRING "No or.." PRINT NL
+END
+
+STRING "1 NOT" PRINT NL
+INT 1 NOT IF
+ELSE
+    STRING "Not not!" PRINT NL
+END
+STRING "0 NOT" PRINT NL
+INT 0 NOT IF
+    STRING "Yes not!" PRINT NL
+END
+STRING "5 NOT is an error." PRINT NL
+INT 5 NOT PRINT NL
+

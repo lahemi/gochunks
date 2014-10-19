@@ -1,0 +1,18 @@
+FLOAT 1.2 2.4 5.5 2.0 9.3
+.S NL
+INT 3
+.S NL
+FLOAT PICK
+.S NL
+
+STRING "one" "two" "three and half" "beep" "boop"
+.S NL
+INT 4
+STRING PICK
+.S NL
+
+INT 1 2 3 4 5 6
+.S NL
+INT 4
+INT PICK
+.S NL

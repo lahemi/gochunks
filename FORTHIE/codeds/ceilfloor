@@ -1,0 +1,11 @@
+STRING "⌊ (floor) and ⌈ (ceiling)." PRINT NL
+
+STRING "2.6 ⌊ → " PRINT
+FLOAT 2.6 ⌊ PRINT NL
+
+STRING "2.6 ⌈ → " PRINT
+FLOAT 2.6 ⌈ PRINT NL
+
+STRING "This will do nothing, leaving 3 untouched." PRINT NL
+STRING "3 ⌈ → " PRINT
+INT 3 ⌈ PRINT NL
