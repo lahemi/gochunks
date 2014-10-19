@@ -5,14 +5,14 @@ MULTESTS
     2 =
     SWAP
     2 > ∨ IF
-        STRING "yey" PRINT NL
+        STRING "yey" PRINTNL
         INT 4 = IF
-            STRING "even" PRINT NL
+            STRING "even" PRINTNL
         ELSE
-            STRING "odd" PRINT NL
+            STRING "odd" PRINTNL
         END
     ELSE
-        STRING "nope" PRINT NL
+        STRING "nope" PRINTNL
     END
 ;
 

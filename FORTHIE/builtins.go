@@ -51,8 +51,6 @@ func comparisonOpers(comp string, env *ENV) {
 
 var BUILTINS = map[string]func(env *ENV){
 	// ↑ ↓ hide, unhide ?
-	// ⍲ ⍱ nand, nor
-	// / º reduce, apply
 	//
 	"INT": func(env *ENV) {
 		env.SetMode(INT)
@@ -176,6 +174,28 @@ var BUILTINS = map[string]func(env *ENV){
 				env.INTS.Push(1)
 			} else {
 				env.INTS.Push(-1)
+			}
+		}
+	},
+	"NAND": func(env *ENV) {
+		switch env.MODE {
+		case INT:
+			a2, a1 := env.INTS.Pop(), env.INTS.Pop()
+			if a1 == 1 && a2 == 1 {
+				env.INTS.Push(0)
+			} else {
+				env.INTS.Push(1)
+			}
+		}
+	},
+	"NOR": func(env *ENV) {
+		switch env.MODE {
+		case INT:
+			a2, a1 := env.INTS.Pop(), env.INTS.Pop()
+			if a1 == 0 && a2 == 0 {
+				env.INTS.Push(1)
+			} else {
+				env.INTS.Push(0)
 			}
 		}
 	},
@@ -308,5 +328,9 @@ var BUILTINS = map[string]func(env *ENV){
 		case STRING:
 			env.STRINGS.Push(env.STRINGS[len(env.STRINGS)-n-1])
 		}
+	},
+
+	"HERE": func(env *ENV) {
+		env.INTS.Push(env.CP)
 	},
 }

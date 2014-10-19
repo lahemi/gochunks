@@ -1,11 +1,11 @@
-STRING "⌊ (floor) and ⌈ (ceiling)." PRINT NL
+STRING "⌊ (floor) and ⌈ (ceiling)." PRINTNL
 
 STRING "2.6 ⌊ → " PRINT
-FLOAT 2.6 ⌊ PRINT NL
+FLOAT 2.6 ⌊ PRINTNL
 
 STRING "2.6 ⌈ → " PRINT
-FLOAT 2.6 ⌈ PRINT NL
+FLOAT 2.6 ⌈ PRINTNL
 
-STRING "This will do nothing, leaving 3 untouched." PRINT NL
+STRING "This will do nothing, leaving 3 untouched." PRINTNL
 STRING "3 ⌈ → " PRINT
-INT 3 ⌈ PRINT NL
+INT 3 ⌈ PRINTNL

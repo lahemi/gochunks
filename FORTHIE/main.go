@@ -116,6 +116,9 @@ func createASTree(untypeds []string) (elems []ELEM) {
 	}
 	return
 }
+func ASTify(text string) []ELEM {
+	return createASTree(untypeds(text))
+}
 func printASTree(elems []ELEM) {
 	for i, e := range elems {
 		if v, ok := TYPES[e.Type]; ok {
@@ -138,6 +141,7 @@ type ENV struct {
 	FLOATS  Fstack
 	STRINGS Sstack
 	MODE    MODES
+	CP      int
 }
 
 func (e *ENV) SetMode(m MODES) {
@@ -146,7 +150,9 @@ func (e *ENV) SetMode(m MODES) {
 
 var (
 	GENV   = ENV{}
-	IDENTS = map[string][]ELEM{}
+	IDENTS = map[string][]ELEM{
+		"PRINTNL": ASTify(`PRINT NL`),
+	}
 )
 
 func compile(code []ELEM) {
@@ -198,6 +204,8 @@ func eval(code []ELEM, env ENV) {
 		if cp >= len(code) {
 			return
 		}
+
+		env.CP = cp
 
 		c := code[cp]
 
@@ -269,7 +277,7 @@ func init() {
 }
 
 func main() {
-	cptest := createASTree(untypeds(readText(flag.Arg(0))))
+	cptest := ASTify(readText(flag.Arg(0)))
 	compile(cptest)
 	els := removeComps(cptest)
 

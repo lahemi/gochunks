@@ -1,11 +1,11 @@
-STRING "Some stack operations" PRINT NL
+STRING "Some stack operations" PRINTNL
 
-INT 1 2 3  .S STRING " start" PRINT NL
-INT DROP   .S STRING " DROP!" PRINT NL
-INT SWAP   .S STRING " swap"  PRINT NL
-INT DUP    .S STRING " dup"   PRINT NL
-INT ROT    .S STRING " rot"   PRINT NL
+INT 1 2 3  .S STRING " start" PRINTNL
+INT DROP   .S STRING " DROP!" PRINTNL
+INT SWAP   .S STRING " swap"  PRINTNL
+INT DUP    .S STRING " dup"   PRINTNL
+INT ROT    .S STRING " rot"   PRINTNL
 
-INT 3 4 5  .S STRING " add some stuff for..." PRINT NL
-INT 3 INT PICK .S STRING " pick!"  PRINT NL
+INT 3 4 5  .S STRING " add some stuff for..." PRINTNL
+INT 3 INT PICK .S STRING " pick!"  PRINTNL
 

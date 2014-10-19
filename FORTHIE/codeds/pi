@@ -1,3 +1,3 @@
-STRING "○ gives you some Pi." PRINT NL
+STRING "○ gives you some Pi." PRINTNL
 
-○ FLOAT PRINT NL
+○ FLOAT PRINTNL
