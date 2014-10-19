@@ -42,8 +42,12 @@ callang
 
 FORTHIE
 
-    - A sort of mini-FORTH, still incomplete, compiling words works,
-      but need to add more basic words, and finish branching.
+    - A sort strongly typed mini-FORTH.
+    - Compiling words and branching works, the latter sort of.
+    - No looping implemented yet, the primitives are there though.
+    - Current data types are integer, float64, and string.
+    - Thanks to Go, FORTH code is handled as UTF-8, non-ASCII is not a problem.
+    - Quite a bit of "builtin" words.
 
 
 bitap
