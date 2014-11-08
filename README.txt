@@ -50,6 +50,12 @@ FORTHIE
     - Quite a bit of "builtin" words.
 
 
+ordo
+
+    A character(rune) oriented text "editing" language.
+    Something a between ed and TECO, much in the works at the moment though.
+
+
 bitap
 
     http://en.wikipedia.org/wiki/Bitap_algorithm at least sort of
