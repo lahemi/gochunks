@@ -5,19 +5,8 @@ import (
 	"os"
 )
 
-// Relative to current position.
-func moveChar(e *ENV) {
-	i, err := e.Numargs.PopE()
-	if err != nil {
-		return
-	}
-	tp := e.Pos + i.(int)
-	if tp < len(e.Text) && tp >= 0 {
-		e.Pos = tp
-	}
-}
-
 // Irrelative to current position, absolute.
+// Use currentPos for relative movement.
 func jumpChar(e *ENV) {
 	a, err := e.Numargs.PopE()
 	if err != nil {
@@ -31,7 +20,7 @@ func jumpChar(e *ENV) {
 
 // This will be for yanking.
 func curLoadChar(e *ENV) {
-	e.Strargs.Push(e.Text[e.Pos])
+	e.Strargs.Push(string(e.Text[e.Pos]))
 }
 
 func searchCharF(e *ENV) {
@@ -73,16 +62,16 @@ func deleteChar(e *ENV) {
 	e.Text = prev
 }
 
-func insertChar(e *ENV) {
-	prev, next := e.Text[:e.Pos], e.Text[e.Pos:]
+func insert(e *ENV) {
+	prev, next := string(e.Text[:e.Pos]), string(e.Text[e.Pos:])
 	a, err := e.Strargs.PopE()
 	if err != nil {
 		return
 	}
 	ts := prev
-	ts = append(ts, []rune(a.(string))...)
-	ts = append(ts, next...)
-	e.Text = ts
+	ts += a.(string)
+	ts += next
+	e.Text = []rune(ts)
 }
 
 func printChar(e *ENV) {
@@ -133,4 +122,19 @@ func quit(e *ENV) {
 
 func eof(e *ENV) {
 	e.Numargs.Push(len(e.Text) - 1)
+}
+
+func currentPos(e *ENV) {
+	e.Numargs.Push(e.Pos)
+}
+
+func putChar(e *ENV) {
+	a, err := e.Strargs.PopE()
+	if err != nil {
+		return
+	}
+	s := a.(string)
+	e.Strargs.Push(s)
+	insert(e)
+	e.Strargs.Push(s)
 }

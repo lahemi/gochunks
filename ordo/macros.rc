@@ -3,8 +3,11 @@ The `macroLoad`er ignores everything that
 is not between brackets, so no need for
 a separate comment syntax!
 
-(1 m p → mp)
-(`\n` r m → ^)  move to the start of line, note doesn't work on the 1st line
-(`\n` s m → $)  move to the end of line, note doesn't work on the last line
+(cur 1 + j → 1f)
+(cur 1 - j → 1b)
 
-(p `\n` s `mp` rep 1 m → pl)    prints till the end of line
+(cur 1 + j o → 1o)
+(cur `\n` r + j → ^)  move to the start of line, note doesn't work on the 1st line
+(cur `\n` s + j → $)  move to the end of line, note doesn't work on the last line
+
+(o `\n` s `1o` rep 1 m → pl)    prints till the end of line

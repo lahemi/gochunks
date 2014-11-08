@@ -1,13 +1,14 @@
-# Command name can be anything but :
-# and contain whitespaces.
+# Command name can be anything
+# not containing : or whitespaces.
 
-m : moveChar
 j : jumpChar
+y : curLoadChar
+p : putChar
 s : searchCharF
 r : searchCharB
 d : deleteChar
-i : insertChar
-p : printChar
+i : insert
+o : printChar
 
 q : quit
 w : writeFile
@@ -21,3 +22,4 @@ c : changeFile
 rep : repeatCmd
 
 EOF : eof
+cur : currentPos

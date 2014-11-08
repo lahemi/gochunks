@@ -1,15 +1,23 @@
 char:
     move char
-        relative            done
         absolute            done
+        use currentPos
+        for relative
 
     search forward          done
     search back             done
 
     delete                  done
 
-    insert                  done
+    yank                    done
+        note insert can
+        be used for
+        "destructive" put
 
+    put                     done
+
+
+insert                      done
 
 search a word ?
 
@@ -17,7 +25,7 @@ search a word ?
 pre-defined macros          done
 
 interactive mode            done
-macros defs
+macro defs
 
 
 repeat command              done
@@ -33,13 +41,16 @@ if given non-existing       done
 file, create it
 
 save file                   done
+change file                 done
 
+EOF                         done
+current position            done
 
 arithmetic                  done
+
+
 
 conditionals ?
 Would make this possible:
     ('cur [ `\n` r | 'cur ] - j → startofline)
-
-special names for start and end of file, for conveniece ?
 

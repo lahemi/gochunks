@@ -26,12 +26,11 @@ const (
 // used commands from an external config file.
 // So horribly dynamic!
 var COMMANDTABLE = COMMANDSET{
-	"moveChar":       moveChar,
 	"jumpChar":       jumpChar,
 	"searchCharF":    searchCharF,
 	"searchCharB":    searchCharB,
 	"deleteChar":     deleteChar,
-	"insertChar":     insertChar,
+	"insert":         insert,
 	"printChar":      printChar,
 	"quit":           quit,
 	"writeFile":      writeFile,
@@ -42,6 +41,9 @@ var COMMANDTABLE = COMMANDSET{
 	"division":       division,
 	"repeatCmd":      repeatCmd,
 	"eof":            eof,
+	"currentPos":     currentPos,
+	"curLoadChar":    curLoadChar,
+	"putChar":        putChar,
 }
 
 var (
