@@ -7,6 +7,7 @@ import (
 )
 
 type ENV struct {
+	FName   string
 	Text    []rune
 	Pos     int
 	Numargs Stack
@@ -26,11 +27,15 @@ var (
 
 	COMMANDS = map[string]func(*ENV){
 		"m": moveChar,
+		"j": jumpChar,
 		"s": searchCharF,
 		"r": searchCharB,
 		"d": deleteChar,
 		"i": insertChar,
 		"p": printChar,
+		"q": func(e *ENV) { os.Exit(0) },
+		"w": writeFile,
+		"c": changeFile, // empties e.Text !
 	}
 
 	inputFile string
@@ -49,7 +54,7 @@ func eval(cmds []string, env *ENV) {
 			env.Strargs.Push(cc)
 		} else if strings.HasPrefix(c, MACROMARKER) {
 			if m, ok := MACROTABLE[string(c[len(MACROMARKER):])]; ok {
-				eval(cmdList([]byte(m)), env)
+				eval(cmdList([]rune(m)), env)
 			}
 		}
 	}
@@ -76,15 +81,20 @@ func main() {
 		return
 	}
 	text := readInputFile(inputFile)
-	cmds := cmdList(readCommands(os.Stdin))
+	G_env.FName = inputFile
 	G_env.Text = text
 	G_env.Pos = 0
-	eval(cmds, &G_env)
+	for {
+		cmds := cmdList(readCommands(os.Stdin))
+		eval(cmds, &G_env)
+	}
 }
 
 /*
 char:
-    move char           done
+    move char
+        relative        done
+        absolute        done
 
     search forward      done
     search back         done
@@ -97,19 +107,12 @@ char:
 search a word ?
 
 
-macros                  done, for pre-def'd
+macros                          done, for pre-def'd
 
-(1 m p → pm)
-(`\n` s m → $)
-
-Add macro defs and a macro table,
-so that shorhands like that can be used.
+interactive mode macros defs    done
 
 
-Also, interactive def of macros, not only
-in a separate file loaded at start-up.
-
-repeat command          done, for COMMANDS
+repeat command                  done
 
 ie.
     (1 m p → pm)
@@ -118,4 +121,17 @@ ie.
 
         basically just string/command
         duplication.
+
+
+^G to mean just execute,    done
+not  exec & quit
+
+quit command                done
+
+
+if given non-existing       done
+file, create it
+
+save file                   done
+
 */

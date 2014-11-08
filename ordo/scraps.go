@@ -17,18 +17,26 @@ func stderr(str string) {
 
 const (
 	TERMINATE = ''
+	FUNSTART  = '('
+	FUNEND    = ')'
+	FUNNAME   = '→'
 )
 
 func readInputFile(name string) []rune {
 	cnt, err := ioutil.ReadFile(name)
 	if err != nil {
-		stderr("File reading error.")
+		_, e := os.Create(name)
+		if e != nil {
+			stderr("File creation error.")
+			os.Exit(1)
+		}
 		return []rune{}
 	}
 	return []rune(string(cnt))
 }
 
-func readCommands(file *os.File) (buf []byte) {
+func readCommands(file *os.File) []rune {
+	var buf []byte
 	for {
 		charbuf := make([]byte, 1)
 		_, err := file.Read(charbuf)
@@ -40,7 +48,7 @@ func readCommands(file *os.File) (buf []byte) {
 		}
 		buf = append(buf, charbuf[0])
 	}
-	return
+	return []rune(string(buf))
 }
 
 // Is there a better way to convert a string
@@ -57,10 +65,12 @@ func lit2Esc(str string) string {
 	return str
 }
 
-func cmdList(cmds []byte) (ret []string) {
+// Add interactive marco defs here, perhaps.
+func cmdList(cmds []rune) (ret []string) {
 	const (
 		RD = iota
 		STR
+		COMP
 	)
 	var (
 		buf   string
@@ -76,6 +86,10 @@ func cmdList(cmds []byte) (ret []string) {
 			case buf != "" && isWhite(c):
 				ret = append(ret, buf)
 				buf = ""
+
+			case c == string(FUNSTART):
+				buf += c
+				state = COMP
 
 			case c == "`":
 				buf += c
@@ -93,6 +107,17 @@ func cmdList(cmds []byte) (ret []string) {
 				buf = ""
 			} else {
 				buf += c
+			}
+
+		case COMP:
+			buf += c
+			if c == string(FUNEND) {
+				buf += c
+				for n, m := range compileMacros([]rune(buf)) {
+					MACROTABLE[n] = m
+				}
+				buf = ""
+				state = RD
 			}
 		}
 	}
@@ -126,10 +151,6 @@ func isInt(n string) bool {
 
 func compileMacros(text []rune) MACROS {
 	const (
-		FUNSTART = '('
-		FUNEND   = ')'
-		FUNNAME  = '→'
-
 		RD = iota
 		COMP
 	)

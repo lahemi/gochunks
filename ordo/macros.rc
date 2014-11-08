@@ -4,7 +4,7 @@ is not between brackets, so no need for
 a separate comment syntax!
 
 (1 m p → mp)
-(`\n` r m → ^)  move to the start of line
-(`\n` s m → $)  move to the end of line
+(`\n` r m → ^)  move to the start of line, note doesn't work on the 1st line
+(`\n` s m → $)  move to the end of line, note doesn't work on the last line
 
 (p `\n` s `mp` rep 1 m → pl)    prints till the end of line

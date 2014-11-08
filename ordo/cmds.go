@@ -1,5 +1,10 @@
 package main
 
+import (
+	"io/ioutil"
+)
+
+// Relative to current position.
 func moveChar(e *ENV) {
 	i, err := e.Numargs.PopE()
 	if err != nil {
@@ -11,6 +16,19 @@ func moveChar(e *ENV) {
 	}
 }
 
+// Irrelative to current position, absolute.
+func jumpChar(e *ENV) {
+	a, err := e.Numargs.PopE()
+	if err != nil {
+		return
+	}
+	i := a.(int)
+	if i >= 0 && i < len(e.Text) {
+		e.Pos = i
+	}
+}
+
+// This will be for yanking.
 func curLoadChar(e *ENV) {
 	e.Strargs.Push(e.Text[e.Pos])
 }
@@ -67,7 +85,9 @@ func insertChar(e *ENV) {
 }
 
 func printChar(e *ENV) {
-	stdout(string(e.Text[e.Pos]))
+	if len(e.Text) >= 0 && e.Pos >= 0 && e.Pos < len(e.Text) {
+		stdout(string(e.Text[e.Pos]))
+	}
 }
 
 func repeatCmd(e *ENV) {
@@ -86,7 +106,22 @@ func repeatCmd(e *ENV) {
 	}
 	if m, ok := MACROTABLE[cmd.(string)]; ok {
 		for count := 0; count < rn.(int); count++ {
-			eval(cmdList([]byte(m)), e)
+			eval(cmdList([]rune(m)), e)
 		}
 	}
+}
+
+func writeFile(e *ENV) {
+	if err := ioutil.WriteFile(e.FName, []byte(string(e.Text)), 0666); err != nil {
+		stderr("File write error.")
+	}
+}
+
+func changeFile(e *ENV) {
+	a, err := e.Strargs.PopE()
+	if err != nil {
+		return
+	}
+	e.FName = a.(string)
+	e.Text = []rune("") // Should we preserve the text from previous file?
 }
