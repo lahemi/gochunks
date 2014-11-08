@@ -1,0 +1,23 @@
+# Command name can be anything but :
+# and contain whitespaces.
+
+m : moveChar
+j : jumpChar
+s : searchCharF
+r : searchCharB
+d : deleteChar
+i : insertChar
+p : printChar
+
+q : quit
+w : writeFile
+c : changeFile
+
++ : addition
+- : subtraction
+× : multiplication
+÷ : division
+
+rep : repeatCmd
+
+EOF : eof

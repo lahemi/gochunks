@@ -1,0 +1,45 @@
+char:
+    move char
+        relative            done
+        absolute            done
+
+    search forward          done
+    search back             done
+
+    delete                  done
+
+    insert                  done
+
+
+search a word ?
+
+
+pre-defined macros          done
+
+interactive mode            done
+macros defs
+
+
+repeat command              done
+
+
+^G to mean just execute,    done
+not exec & quit
+
+quit command                done
+
+
+if given non-existing       done
+file, create it
+
+save file                   done
+
+
+arithmetic                  done
+
+conditionals ?
+Would make this possible:
+    ('cur [ `\n` r | 'cur ] - j → startofline)
+
+special names for start and end of file, for conveniece ?
+

@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"os"
 )
 
 // Relative to current position.
@@ -104,7 +105,7 @@ func repeatCmd(e *ENV) {
 			c(e)
 		}
 	}
-	if m, ok := MACROTABLE[cmd.(string)]; ok {
+	if m, ok := MACROS[cmd.(string)]; ok {
 		for count := 0; count < rn.(int); count++ {
 			eval(cmdList([]rune(m)), e)
 		}
@@ -113,7 +114,7 @@ func repeatCmd(e *ENV) {
 
 func writeFile(e *ENV) {
 	if err := ioutil.WriteFile(e.FName, []byte(string(e.Text)), 0666); err != nil {
-		stderr("File write error.")
+		stderr("File write error.\n")
 	}
 }
 
@@ -124,4 +125,12 @@ func changeFile(e *ENV) {
 	}
 	e.FName = a.(string)
 	e.Text = []rune("") // Should we preserve the text from previous file?
+}
+
+func quit(e *ENV) {
+	os.Exit(0)
+}
+
+func eof(e *ENV) {
+	e.Numargs.Push(len(e.Text) - 1)
 }

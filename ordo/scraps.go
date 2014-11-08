@@ -27,7 +27,7 @@ func readInputFile(name string) []rune {
 	if err != nil {
 		_, e := os.Create(name)
 		if e != nil {
-			stderr("File creation error.")
+			stderr("File creation error.\n")
 			os.Exit(1)
 		}
 		return []rune{}
@@ -65,7 +65,6 @@ func lit2Esc(str string) string {
 	return str
 }
 
-// Add interactive marco defs here, perhaps.
 func cmdList(cmds []rune) (ret []string) {
 	const (
 		RD = iota
@@ -88,6 +87,7 @@ func cmdList(cmds []rune) (ret []string) {
 				buf = ""
 
 			case c == string(FUNSTART):
+				// We need the FUNSTART for compileMacros()
 				buf += c
 				state = COMP
 
@@ -102,6 +102,7 @@ func cmdList(cmds []rune) (ret []string) {
 		case STR:
 			if c == "`" {
 				state = RD
+				// ` acts also as a string identifier for later use.
 				buf = "`" + lit2Esc(string(buf[1:]))
 				ret = append(ret, buf)
 				buf = ""
@@ -112,9 +113,8 @@ func cmdList(cmds []rune) (ret []string) {
 		case COMP:
 			buf += c
 			if c == string(FUNEND) {
-				buf += c
 				for n, m := range compileMacros([]rune(buf)) {
-					MACROTABLE[n] = m
+					MACROS[n] = m
 				}
 				buf = ""
 				state = RD
@@ -149,7 +149,7 @@ func isInt(n string) bool {
 	return true
 }
 
-func compileMacros(text []rune) MACROS {
+func compileMacros(text []rune) MACROSET {
 	const (
 		RD = iota
 		COMP
@@ -158,7 +158,7 @@ func compileMacros(text []rune) MACROS {
 		state = RD
 		buf   []rune
 		bbuf  []rune
-		ret   = MACROS{}
+		ret   = MACROSET{}
 	)
 	for _, r := range text {
 		switch state {
@@ -187,6 +187,49 @@ func compileMacros(text []rune) MACROS {
 	return ret
 }
 
-func loadMacros(file string) MACROS {
+func loadMacros(file string) MACROSET {
 	return compileMacros(readInputFile(file))
+}
+
+func loadCommands(file string) COMMANDSET {
+	const (
+		SEP     = ':'
+		DEFSEP  = '\n'
+		COMMENT = '#'
+	)
+	var (
+		ret  = COMMANDSET{}
+		buf  []rune
+		nbuf []rune
+		text = readInputFile(file)
+	)
+	for i := 0; i < len(text); i++ {
+		r := text[i]
+		switch r {
+		case COMMENT:
+			for i++; i < len(text); i++ {
+				if text[i] == '\n' {
+					break
+				}
+			}
+
+		case SEP:
+			nbuf = buf
+			buf = []rune{}
+
+		case DEFSEP:
+			if cmd, ok := COMMANDTABLE[string(buf)]; ok {
+				ret[string(nbuf)] = cmd
+			}
+			nbuf = []rune{}
+			buf = []rune{}
+
+		case ' ', '\t': //, '\n':
+			// ignore
+
+		default:
+			buf = append(buf, r)
+		}
+	}
+	return ret
 }

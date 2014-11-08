@@ -14,29 +14,40 @@ type ENV struct {
 	Strargs Stack
 }
 
-type MACROS map[string]string
+type MACROSET map[string]string
+type COMMANDSET map[string]func(*ENV)
 
 const (
 	STRINGMARKER = "`"
 	MACROMARKER  = "'"
 )
 
-var (
-	MACROTABLE = MACROS{}
-	G_env      = ENV{}
+// This is required so that we may construct the actual
+// used commands from an external config file.
+// So horribly dynamic!
+var COMMANDTABLE = COMMANDSET{
+	"moveChar":       moveChar,
+	"jumpChar":       jumpChar,
+	"searchCharF":    searchCharF,
+	"searchCharB":    searchCharB,
+	"deleteChar":     deleteChar,
+	"insertChar":     insertChar,
+	"printChar":      printChar,
+	"quit":           quit,
+	"writeFile":      writeFile,
+	"changeFile":     changeFile,
+	"addition":       addition,
+	"subtraction":    subtraction,
+	"multiplication": multiplication,
+	"division":       division,
+	"repeatCmd":      repeatCmd,
+	"eof":            eof,
+}
 
-	COMMANDS = map[string]func(*ENV){
-		"m": moveChar,
-		"j": jumpChar,
-		"s": searchCharF,
-		"r": searchCharB,
-		"d": deleteChar,
-		"i": insertChar,
-		"p": printChar,
-		"q": func(e *ENV) { os.Exit(0) },
-		"w": writeFile,
-		"c": changeFile, // empties e.Text !
-	}
+var (
+	G_env    = ENV{}
+	MACROS   = MACROSET{}
+	COMMANDS = COMMANDSET{}
 
 	inputFile string
 )
@@ -53,7 +64,7 @@ func eval(cmds []string, env *ENV) {
 			cc := string(c[len(STRINGMARKER):])
 			env.Strargs.Push(cc)
 		} else if strings.HasPrefix(c, MACROMARKER) {
-			if m, ok := MACROTABLE[string(c[len(MACROMARKER):])]; ok {
+			if m, ok := MACROS[string(c[len(MACROMARKER):])]; ok {
 				eval(cmdList([]rune(m)), env)
 			}
 		}
@@ -62,18 +73,14 @@ func eval(cmds []string, env *ENV) {
 
 func init() {
 	if len(os.Args) != 2 {
-		stderr("Need a input file.\n")
+		stderr("Need an input file.\n")
 		os.Exit(1)
 	}
 	inputFile = os.Args[1]
 
-	// This is separately here, because if we
-	// place it in the same spot as the rest of
-	// the commands, we get an error about circular
-	// reference between COMMANDS and repeatCmd.
-	COMMANDS["rep"] = repeatCmd
-
-	MACROTABLE = loadMacros("macros.rc")
+	// Need proper places for these files.
+	COMMANDS = loadCommands("commands.rc")
+	MACROS = loadMacros("macros.rc")
 }
 
 func main() {
@@ -89,49 +96,3 @@ func main() {
 		eval(cmds, &G_env)
 	}
 }
-
-/*
-char:
-    move char
-        relative        done
-        absolute        done
-
-    search forward      done
-    search back         done
-
-    delete              done
-
-    insert              done
-
-
-search a word ?
-
-
-macros                          done, for pre-def'd
-
-interactive mode macros defs    done
-
-
-repeat command                  done
-
-ie.
-    (1 m p → pm)
-    3 `pm` rep
-        → 1 m p 1 m p 1 m p
-
-        basically just string/command
-        duplication.
-
-
-^G to mean just execute,    done
-not  exec & quit
-
-quit command                done
-
-
-if given non-existing       done
-file, create it
-
-save file                   done
-
-*/
