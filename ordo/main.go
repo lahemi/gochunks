@@ -12,6 +12,7 @@ type ENV struct {
 	Pos     int
 	Numargs Stack
 	Strargs Stack
+	Branch  bool
 }
 
 type MACROSET map[string]string
@@ -20,6 +21,9 @@ type COMMANDSET map[string]func(*ENV)
 const (
 	STRINGMARKER = "`"
 	MACROMARKER  = "'"
+	BRANCHSTART  = "["
+	BRANCHSEP    = "|"
+	BRANCHEND    = "]"
 )
 
 // This is required so that we may construct the actual
@@ -55,16 +59,39 @@ var (
 )
 
 func eval(cmds []string, env *ENV) {
-	for _, c := range cmds {
+	for i := 0; i < len(cmds); i++ {
+		c := cmds[i]
+
 		if cmd, ok := COMMANDS[c]; ok {
 			cmd(env)
+
 		} else if isInt(c) {
 			// Yes, but we test for its validity already with isInt.
 			i, _ := strconv.Atoi(c)
 			env.Numargs.Push(i)
+
 		} else if strings.HasPrefix(c, STRINGMARKER) {
 			cc := string(c[len(STRINGMARKER):])
 			env.Strargs.Push(cc)
+
+			// Ugh, so nasty... But it works, at least for simple cases.
+		} else if c == BRANCHSTART {
+			if env.Branch {
+				for i++; i < len(cmds); i++ {
+					if cmds[i] == BRANCHSEP {
+						break
+					}
+				}
+				env.Branch = false
+			}
+
+		} else if c == BRANCHSEP {
+			for i++; i < len(cmds); i++ {
+				if cmds[i] == BRANCHEND {
+					break
+				}
+			}
+
 		} else if strings.HasPrefix(c, MACROMARKER) {
 			if m, ok := MACROS[string(c[len(MACROMARKER):])]; ok {
 				eval(cmdList([]rune(m)), env)

@@ -1,4 +1,3 @@
-
 The `macroLoad`er ignores everything that
 is not between brackets, so no need for
 a separate comment syntax!
@@ -6,8 +5,25 @@ a separate comment syntax!
 (cur 1 + j → 1f)
 (cur 1 - j → 1b)
 
-(cur 1 + j o → 1o)
-(cur `\n` r + j → ^)  move to the start of line, note doesn't work on the 1st line
-(cur `\n` s + j → $)  move to the end of line, note doesn't work on the last line
+move to the start of line, and handle
+the special case of start of a file
+(cur `\n` r [ - 1 + | cur - ] j → ^)
+move to the end of a line
+(cur `\n` s + 1 - j → $)
 
-(o `\n` s `1o` rep 1 m → pl)    prints till the end of line
+(cur 1 + j o → 1o)
+
+prints till the end of line
+(o `\n` s `1o` rep cur 1 - j → pl)
+
+print the current line
+('^ 'pl → println)
+
+print line and move to the next line
+('println '1f '1f → spl)
+
+next line
+('$ '1f '1f → next)
+prev line
+('^ '1b '1b '^ → prev)
+

@@ -49,8 +49,7 @@ current position            done
 arithmetic                  done
 
 
-
-conditionals ?
-Would make this possible:
-    ('cur [ `\n` r | 'cur ] - j → startofline)
+simple and limited          done
+conditionals 
+    (cur `\n` r [ 1 + | cur ] - j → startofline)
 

@@ -35,6 +35,8 @@ func searchCharF(e *ENV) {
 			return
 		}
 	}
+	// If it ever gets here, it means the char were not found.
+	e.Branch = true
 }
 
 func searchCharB(e *ENV) {
@@ -45,10 +47,11 @@ func searchCharB(e *ENV) {
 	for i := e.Pos; i >= 0; i-- {
 		c := e.Text[i]
 		if string(c) == a.(string) {
-			e.Numargs.Push(-i)
+			e.Numargs.Push(e.Pos - i)
 			return
 		}
 	}
+	e.Branch = true
 }
 
 func deleteChar(e *ENV) {
