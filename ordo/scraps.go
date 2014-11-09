@@ -139,7 +139,7 @@ func isWhite(c string) bool {
 
 func isInt(n string) bool {
 	for i := 0; i < len(n); i++ {
-		if i == 0 && n[i] == '-' {
+		if i == 0 && n[i] == '-' && len(n) > 1 {
 			continue
 		}
 		if n[i] < 48 || n[i] > 57 {
@@ -189,47 +189,4 @@ func compileMacros(text []rune) MACROSET {
 
 func loadMacros(file string) MACROSET {
 	return compileMacros(readInputFile(file))
-}
-
-func loadCommands(file string) COMMANDSET {
-	const (
-		SEP     = ':'
-		DEFSEP  = '\n'
-		COMMENT = '#'
-	)
-	var (
-		ret  = COMMANDSET{}
-		buf  []rune
-		nbuf []rune
-		text = readInputFile(file)
-	)
-	for i := 0; i < len(text); i++ {
-		r := text[i]
-		switch r {
-		case COMMENT:
-			for i++; i < len(text); i++ {
-				if text[i] == '\n' {
-					break
-				}
-			}
-
-		case SEP:
-			nbuf = buf
-			buf = []rune{}
-
-		case DEFSEP:
-			if cmd, ok := COMMANDTABLE[string(buf)]; ok {
-				ret[string(nbuf)] = cmd
-			}
-			nbuf = []rune{}
-			buf = []rune{}
-
-		case ' ', '\t': //, '\n':
-			// ignore
-
-		default:
-			buf = append(buf, r)
-		}
-	}
-	return ret
 }

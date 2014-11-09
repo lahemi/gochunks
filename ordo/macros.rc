@@ -2,6 +2,30 @@ The `macroLoad`er ignores everything that
 is not between brackets, so no need for
 a separate comment syntax!
 
+(jumpChar    → j)
+(jumpChar    → j)
+(curLoadChar → y)
+(putChar     → p)
+(searchCharF → s)
+(searchCharB → r)
+(deleteChar  → d)
+(insert      → i)
+(printChar   → o)
+
+(quit       → q)
+(writeFile  → w)
+(changeFile → c)
+
+(addition       → +)
+(subtraction    → -)
+(multiplication → ×)
+(division       → ÷)
+
+(eof        → EOF)
+(repeatCmd  → rep)
+(currentPos → cur)
+
+
 (cur 1 + j → 1f)
 (cur 1 - j → 1b)
 
@@ -17,13 +41,12 @@ prints till the end of line
 (o `\n` s `1o` rep cur 1 - j → pl)
 
 print the current line
-('^ 'pl → println)
+(^ pl → println)
 
 print line and move to the next line
-('println '1f '1f → spl)
+(println 1f 1f → spl)
 
 next line
-('$ '1f '1f → next)
+($ 1f 1f → next)
 prev line
-('^ '1b '1b '^ → prev)
-
+(^ 1b 1b ^ → prev)

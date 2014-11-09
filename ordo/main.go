@@ -20,16 +20,12 @@ type COMMANDSET map[string]func(*ENV)
 
 const (
 	STRINGMARKER = "`"
-	MACROMARKER  = "'"
 	BRANCHSTART  = "["
 	BRANCHSEP    = "|"
 	BRANCHEND    = "]"
 )
 
-// This is required so that we may construct the actual
-// used commands from an external config file.
-// So horribly dynamic!
-var COMMANDTABLE = COMMANDSET{
+var COMMANDS = COMMANDSET{
 	"jumpChar":       jumpChar,
 	"searchCharF":    searchCharF,
 	"searchCharB":    searchCharB,
@@ -43,7 +39,6 @@ var COMMANDTABLE = COMMANDSET{
 	"subtraction":    subtraction,
 	"multiplication": multiplication,
 	"division":       division,
-	"repeatCmd":      repeatCmd,
 	"eof":            eof,
 	"currentPos":     currentPos,
 	"curLoadChar":    curLoadChar,
@@ -51,9 +46,8 @@ var COMMANDTABLE = COMMANDSET{
 }
 
 var (
-	G_env    = ENV{}
-	MACROS   = MACROSET{}
-	COMMANDS = COMMANDSET{}
+	G_env  = ENV{}
+	MACROS = MACROSET{}
 
 	inputFile string
 )
@@ -92,10 +86,8 @@ func eval(cmds []string, env *ENV) {
 				}
 			}
 
-		} else if strings.HasPrefix(c, MACROMARKER) {
-			if m, ok := MACROS[string(c[len(MACROMARKER):])]; ok {
-				eval(cmdList([]rune(m)), env)
-			}
+		} else if m, ok := MACROS[c]; ok {
+			eval(cmdList([]rune(m)), env)
 		}
 	}
 }
@@ -107,8 +99,13 @@ func init() {
 	}
 	inputFile = os.Args[1]
 
+	// This needs to be separate from the rest,
+	// if we define it at the same time we do
+	// the others, we get a warning about
+	// a circular reference.
+	COMMANDS["repeatCmd"] = repeatCmd
+
 	// Need proper places for these files.
-	COMMANDS = loadCommands("commands.rc")
 	MACROS = loadMacros("macros.rc")
 }
 

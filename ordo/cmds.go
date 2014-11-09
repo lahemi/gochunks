@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-// Irrelative to current position, absolute.
+// Non-relative to current position, absolute.
 // Use currentPos for relative movement.
 func jumpChar(e *ENV) {
 	a, err := e.Numargs.PopE()
@@ -18,7 +18,6 @@ func jumpChar(e *ENV) {
 	}
 }
 
-// This will be for yanking.
 func curLoadChar(e *ENV) {
 	e.Strargs.Push(string(e.Text[e.Pos]))
 }
