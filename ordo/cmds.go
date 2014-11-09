@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 // Non-relative to current position, absolute.
@@ -139,4 +140,20 @@ func putChar(e *ENV) {
 	e.Strargs.Push(s)
 	insert(e)
 	e.Strargs.Push(s)
+}
+
+func upperChar(e *ENV) {
+	a, err := e.Strargs.PopE()
+	if err != nil {
+		return
+	}
+	e.Strargs.Push(strings.ToUpper(a.(string)))
+}
+
+func lowerChar(e *ENV) {
+	a, err := e.Strargs.PopE()
+	if err != nil {
+		return
+	}
+	e.Strargs.Push(strings.ToLower(a.(string)))
 }

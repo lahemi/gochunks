@@ -43,6 +43,8 @@ var COMMANDS = COMMANDSET{
 	"currentPos":     currentPos,
 	"curLoadChar":    curLoadChar,
 	"putChar":        putChar,
+	"upperChar":      upperChar,
+	"lowerChar":      lowerChar,
 }
 
 var (
@@ -116,7 +118,6 @@ func main() {
 	text := readInputFile(inputFile)
 	G_env.FName = inputFile
 	G_env.Text = text
-	G_env.Pos = 0
 	for {
 		cmds := cmdList(readCommands(os.Stdin))
 		eval(cmds, &G_env)

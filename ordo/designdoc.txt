@@ -95,8 +95,8 @@ modes:
 
 
 
-lower case
-upper case
+lower case          done
+upper case          done
 
 
 set (named) mark|label

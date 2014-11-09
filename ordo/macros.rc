@@ -79,3 +79,6 @@ though not really relevant here.
 
 (^ `\n` s `d` rep → delete-line)
 
+(y upperChar d i → char-upper)
+(y lowerChar d i → char-lower)
+
