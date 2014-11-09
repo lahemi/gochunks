@@ -16,7 +16,7 @@ func stderr(str string) {
 }
 
 const (
-	TERMINATE = ''
+	TERMINATE = ''
 	FUNSTART  = '('
 	FUNEND    = ')'
 	FUNNAME   = '→'

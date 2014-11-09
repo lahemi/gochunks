@@ -27,7 +27,7 @@ func searchCharF(e *ENV) {
 	if err != nil {
 		return
 	}
-	for i := e.Pos; i < len(e.Text); i++ {
+	for i := e.Pos + 1; i < len(e.Text); i++ {
 		c := e.Text[i]
 		if string(c) == a.(string) {
 			e.Numargs.Push(i - e.Pos)
@@ -43,7 +43,7 @@ func searchCharB(e *ENV) {
 	if err != nil {
 		return
 	}
-	for i := e.Pos; i >= 0; i-- {
+	for i := e.Pos - 1; i >= 0; i-- {
 		c := e.Text[i]
 		if string(c) == a.(string) {
 			e.Numargs.Push(e.Pos - i)

@@ -43,6 +43,8 @@ file, create it
 save file                   done
 change file                 done
 
+save file as
+
 EOF                         done
 current position            done
 
@@ -52,4 +54,61 @@ arithmetic                  done
 simple and limited          done
 conditionals 
     (cur `\n` r [ 1 + | cur ] - j → startofline)
+
+
+
+keep a buffer of
+a few of latest changes
+
+undo
+
+
+yank word
+yank line
+
+
+macros:
+    char forward        done
+    char backward       done
+    start of line       done
+    end of line         done
+    next line           done
+    prev line           done
+    word forward        done
+    word back           done
+    go to line          done
+
+    delete word
+        forward         done
+        backward        done
+    delete line         done
+
+
+keep track of line
+linenumbers
+
+
+modes:
+    shell like interactive          done
+    immediate interactive
+    script(read cmds from file)
+
+
+
+lower case
+upper case
+
+
+set (named) mark|label
+    eg.
+        cur `markhere` mark
+        ...stuffes...
+        `markhere` mark-loc jump
+
+        cur `markstart` mark
+        ...stuffes...
+        `markstart` mark-loc cur yank|delete
+
+
+indent
 

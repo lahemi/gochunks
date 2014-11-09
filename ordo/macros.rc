@@ -2,6 +2,9 @@ The `macroLoad`er ignores everything that
 is not between brackets, so no need for
 a separate comment syntax!
 
+First we assign the exposed
+functions to shorthands.
+
 (jumpChar    → j)
 (jumpChar    → j)
 (curLoadChar → y)
@@ -25,11 +28,11 @@ a separate comment syntax!
 (repeatCmd  → rep)
 (currentPos → cur)
 
-
+Move one char forward and backward.
 (cur 1 + j → 1f)
 (cur 1 - j → 1b)
 
-move to the start of line, and handle
+Move to the start of line, and handle
 the special case of start of a file
 (cur `\n` r [ - 1 + | cur - ] j → ^)
 move to the end of a line
@@ -37,16 +40,42 @@ move to the end of a line
 
 (cur 1 + j o → 1o)
 
-prints till the end of line
+Prints till the end of line
 (o `\n` s `1o` rep cur 1 - j → pl)
 
-print the current line
-(^ pl → println)
+Print the current line
+(^ pl ^ → println)
 
-print line and move to the next line
-(println 1f 1f → spl)
+Print line and move to the next line
+(println $ 1f 1f → spl)
 
-next line
-($ 1f 1f → next)
-prev line
-(^ 1b 1b ^ → prev)
+($ 1f 1f   → next-line)
+(next-line → )
+(^ 1b 1b ^ → prev-line)
+(prev-line → )
+
+(cur ` ` s + j → forward-word)
+(forward-word  → )
+(cur ` ` r - j → backward-word)
+(backward-word → )
+
+The arg to this is not really visible here.
+Move to the beginning of the file, and
+then just repeat next-line given times,
+ie. 5 `goto-line` goes to the line 6.
+This is quite inefficient though, the
+larger the file and the deeper the
+desired line is. On the more positive
+note though, this'd be the thing to do
+anyway when printing the line numbers,
+though not really relevant here.
+(0 j `next-line` rep → goto-line)
+
+
+(` ` s `d` rep → forward-word-delete)
+(forward-word-delete  → fwd)
+(backward-word fwd    → backward-word-delete)
+(backward-word-delete → bwd)
+
+(^ `\n` s `d` rep → delete-line)
+
