@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ordo/stack"
 	"os"
 	"strconv"
 	"strings"
@@ -10,8 +11,8 @@ type ENV struct {
 	FName   string
 	Text    []rune
 	Pos     int
-	Numargs Stack
-	Strargs Stack
+	Numargs stack.Stack
+	Strargs stack.Stack
 	Branch  bool
 }
 
@@ -45,6 +46,16 @@ var COMMANDS = COMMANDSET{
 	"putChar":        putChar,
 	"upperChar":      upperChar,
 	"lowerChar":      lowerChar,
+	"StrDup":         func(e *ENV) { e.Strargs.Dup() },
+	"StrDrop":        func(e *ENV) { e.Strargs.Drop() },
+	"StrSwap":        func(e *ENV) { e.Strargs.Swap() },
+	"StrOver":        func(e *ENV) { e.Strargs.Over() },
+	"StrRot":         func(e *ENV) { e.Strargs.Rot() },
+	"NumDup":         func(e *ENV) { e.Numargs.Dup() },
+	"NumDrop":        func(e *ENV) { e.Numargs.Drop() },
+	"NumSwap":        func(e *ENV) { e.Numargs.Swap() },
+	"NumOver":        func(e *ENV) { e.Numargs.Over() },
+	"NumRot":         func(e *ENV) { e.Numargs.Rot() },
 }
 
 var (

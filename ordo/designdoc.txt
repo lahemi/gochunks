@@ -112,3 +112,13 @@ set (named) mark|label
 
 indent
 
+
+basic stack opers
+    DUP                 done
+    DROP                done
+    SWAP                done
+    OVER                done
+    ROT                 done
+    PICK ?
+
+

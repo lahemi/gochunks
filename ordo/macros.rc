@@ -28,6 +28,7 @@ functions to shorthands.
 (repeatCmd  → rep)
 (currentPos → cur)
 
+
 Move one char forward and backward.
 (cur 1 + j → 1f)
 (cur 1 - j → 1b)
