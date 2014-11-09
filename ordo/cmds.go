@@ -9,7 +9,7 @@ import (
 // Non-relative to current position, absolute.
 // Use currentPos for relative movement.
 func jumpChar(e *ENV) {
-	a, err := e.Numargs.PopE()
+	a, err := e.Nums.PopE()
 	if err != nil {
 		return
 	}
@@ -20,18 +20,18 @@ func jumpChar(e *ENV) {
 }
 
 func curLoadChar(e *ENV) {
-	e.Strargs.Push(string(e.Text[e.Pos]))
+	e.Strs.Push(string(e.Text[e.Pos]))
 }
 
 func searchCharF(e *ENV) {
-	a, err := e.Strargs.PopE()
+	a, err := e.Strs.PopE()
 	if err != nil {
 		return
 	}
 	for i := e.Pos + 1; i < len(e.Text); i++ {
 		c := e.Text[i]
 		if string(c) == a.(string) {
-			e.Numargs.Push(i - e.Pos)
+			e.Nums.Push(i - e.Pos)
 			return
 		}
 	}
@@ -40,14 +40,14 @@ func searchCharF(e *ENV) {
 }
 
 func searchCharB(e *ENV) {
-	a, err := e.Strargs.PopE()
+	a, err := e.Strs.PopE()
 	if err != nil {
 		return
 	}
 	for i := e.Pos - 1; i >= 0; i-- {
 		c := e.Text[i]
 		if string(c) == a.(string) {
-			e.Numargs.Push(e.Pos - i)
+			e.Nums.Push(e.Pos - i)
 			return
 		}
 	}
@@ -67,7 +67,7 @@ func deleteChar(e *ENV) {
 
 func insert(e *ENV) {
 	prev, next := string(e.Text[:e.Pos]), string(e.Text[e.Pos:])
-	a, err := e.Strargs.PopE()
+	a, err := e.Strs.PopE()
 	if err != nil {
 		return
 	}
@@ -84,20 +84,24 @@ func printChar(e *ENV) {
 }
 
 func repeatCmd(e *ENV) {
-	rn, err := e.Numargs.PopE()
+	rn, err := e.Nums.PopE()
 	if err != nil {
 		return
 	}
-	cmd, err := e.Strargs.PopE()
+	cmd, err := e.Strs.PopE()
 	if err != nil {
 		return
 	}
-	if c, ok := COMMANDS[cmd.(string)]; ok {
+	scmd := cmd.(string)
+
+	if c, ok := COMMANDS[scmd]; ok {
 		for count := 0; count < rn.(int); count++ {
 			c(e)
 		}
+		return
 	}
-	if m, ok := MACROS[cmd.(string)]; ok {
+
+	if m, ok := MACROS[scmd]; ok {
 		for count := 0; count < rn.(int); count++ {
 			eval(cmdList([]rune(m)), e)
 		}
@@ -111,7 +115,7 @@ func writeFile(e *ENV) {
 }
 
 func changeFile(e *ENV) {
-	a, err := e.Strargs.PopE()
+	a, err := e.Strs.PopE()
 	if err != nil {
 		return
 	}
@@ -124,36 +128,48 @@ func quit(e *ENV) {
 }
 
 func eof(e *ENV) {
-	e.Numargs.Push(len(e.Text) - 1)
+	e.Nums.Push(len(e.Text) - 1)
 }
 
 func currentPos(e *ENV) {
-	e.Numargs.Push(e.Pos)
+	e.Nums.Push(e.Pos)
 }
 
 func putChar(e *ENV) {
-	a, err := e.Strargs.PopE()
+	a, err := e.Strs.PopE()
 	if err != nil {
 		return
 	}
 	s := a.(string)
-	e.Strargs.Push(s)
+	e.Strs.Push(s)
 	insert(e)
-	e.Strargs.Push(s)
+	e.Strs.Push(s)
 }
 
 func upperChar(e *ENV) {
-	a, err := e.Strargs.PopE()
+	a, err := e.Strs.PopE()
 	if err != nil {
 		return
 	}
-	e.Strargs.Push(strings.ToUpper(a.(string)))
+	e.Strs.Push(strings.ToUpper(a.(string)))
 }
 
 func lowerChar(e *ENV) {
-	a, err := e.Strargs.PopE()
+	a, err := e.Strs.PopE()
 	if err != nil {
 		return
 	}
-	e.Strargs.Push(strings.ToLower(a.(string)))
+	e.Strs.Push(strings.ToLower(a.(string)))
+}
+
+func testChar(e *ENV) {
+	a, err := e.Strs.PopE()
+	if err != nil {
+		return
+	}
+	curLoadChar(e)
+	c := e.Strs.Pop()
+	if c.(string) == a.(string) {
+		// and then somehow use the ret of test.
+	}
 }

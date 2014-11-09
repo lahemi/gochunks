@@ -83,3 +83,14 @@ though not really relevant here.
 (y upperChar d i → char-upper)
 (y lowerChar d i → char-lower)
 
+(y 1f → 1y)
+These tuck away the a mount of chars yank in
+the GenSt stack, so that putting|inserting
+is a bit more flexible.
+(` ` s NumDup NumPop `1y` rep → yank-word)
+Includes the newline.
+(`\n` s 1 + NumDup NumPop `1y` rep → yank-line)
+
+(` ` i → si)
+(^ 4 `si` rep → indent-right)
+

@@ -55,6 +55,9 @@ simple and limited          done
 conditionals 
     (cur `\n` r [ 1 + | cur ] - j → startofline)
 
+    more sophisticated
+    conditionals
+
 
 
 keep a buffer of
@@ -63,8 +66,8 @@ a few of latest changes
 undo
 
 
-yank word
-yank line
+yank word               done
+yank line               done
 
 
 macros:
@@ -109,6 +112,9 @@ set (named) mark|label
         ...stuffes...
         `markstart` mark-loc cur yank|delete
 
+        keep a mark map:
+            MARKS = map[string]int // name, pos
+
 
 indent
 
@@ -121,4 +127,38 @@ basic stack opers
     ROT                 done
     PICK ?
 
+
+
+change from automagick Pop to one
+that needs to be called by the user ?
+    then we'd have Strargs and Numargs
+    and at least one stack more for
+    the stuff immediatelly in use.
+        Make that stack a general one ?
+
+
+
+search character classes:
+    whitespaces
+    num
+    alpha
+    alphanum
+    brackets
+
+
+Add for repeatCmd an inline `macro` def:
+    ie.
+        (^ 4 `(` ` i)` rep → indent-right)
+
+some kind of enhanced syntax for rep
+`(` ` i)` doesn't really work
+
+(^ 4 {` ` i} rep → indent-right)
+
+Need a test for current char
+
+
+Either change quoting so that nested
+patterns are simple to handle or do
+a little more parsing and stack foolery.
 

@@ -8,12 +8,13 @@ import (
 )
 
 type ENV struct {
-	FName   string
-	Text    []rune
-	Pos     int
-	Numargs stack.Stack
-	Strargs stack.Stack
-	Branch  bool
+	FName  string
+	Text   []rune
+	Pos    int
+	Nums   stack.Stack
+	Strs   stack.Stack
+	GenSt  stack.Stack // for tucking away things...
+	Branch bool
 }
 
 type MACROSET map[string]string
@@ -46,16 +47,48 @@ var COMMANDS = COMMANDSET{
 	"putChar":        putChar,
 	"upperChar":      upperChar,
 	"lowerChar":      lowerChar,
-	"StrDup":         func(e *ENV) { e.Strargs.Dup() },
-	"StrDrop":        func(e *ENV) { e.Strargs.Drop() },
-	"StrSwap":        func(e *ENV) { e.Strargs.Swap() },
-	"StrOver":        func(e *ENV) { e.Strargs.Over() },
-	"StrRot":         func(e *ENV) { e.Strargs.Rot() },
-	"NumDup":         func(e *ENV) { e.Numargs.Dup() },
-	"NumDrop":        func(e *ENV) { e.Numargs.Drop() },
-	"NumSwap":        func(e *ENV) { e.Numargs.Swap() },
-	"NumOver":        func(e *ENV) { e.Numargs.Over() },
-	"NumRot":         func(e *ENV) { e.Numargs.Rot() },
+
+	"StrPop": func(e *ENV) {
+		if r, err := e.Strs.PopE(); err == nil {
+			e.GenSt.Push(r)
+		}
+	},
+	"StrDup":  func(e *ENV) { e.Strs.Dup() },
+	"StrDrop": func(e *ENV) { e.Strs.Drop() },
+	"StrSwap": func(e *ENV) { e.Strs.Swap() },
+	"StrOver": func(e *ENV) { e.Strs.Over() },
+	"StrRot":  func(e *ENV) { e.Strs.Rot() },
+	"NumPop": func(e *ENV) {
+		if r, err := e.Nums.PopE(); err == nil {
+			e.GenSt.Push(r)
+		}
+	},
+	"NumDup":  func(e *ENV) { e.Nums.Dup() },
+	"NumDrop": func(e *ENV) { e.Nums.Drop() },
+	"NumSwap": func(e *ENV) { e.Nums.Swap() },
+	"NumOver": func(e *ENV) { e.Nums.Over() },
+	"NumRot":  func(e *ENV) { e.Nums.Rot() },
+
+	// ...
+	"GenPop": func(e *ENV) {
+		if s, err := e.Strs.PopE(); err == nil {
+			switch s.(string) {
+			case "s":
+				if r, err := e.GenSt.PopE(); err == nil {
+					e.Strs.Push(r.(string))
+				}
+			case "n":
+				if r, err := e.GenSt.PopE(); err == nil {
+					e.Nums.Push(r.(int))
+				}
+			}
+		}
+	},
+	"GenDup":  func(e *ENV) { e.GenSt.Dup() },
+	"GenDrop": func(e *ENV) { e.GenSt.Drop() },
+	"GenSwap": func(e *ENV) { e.GenSt.Swap() },
+	"GenOver": func(e *ENV) { e.GenSt.Over() },
+	"GenRot":  func(e *ENV) { e.GenSt.Rot() },
 }
 
 var (
@@ -75,11 +108,11 @@ func eval(cmds []string, env *ENV) {
 		} else if isInt(c) {
 			// Yes, but we test for its validity already with isInt.
 			i, _ := strconv.Atoi(c)
-			env.Numargs.Push(i)
+			env.Nums.Push(i)
 
 		} else if strings.HasPrefix(c, STRINGMARKER) {
 			cc := string(c[len(STRINGMARKER):])
-			env.Strargs.Push(cc)
+			env.Strs.Push(cc)
 
 			// Ugh, so nasty... But it works, at least for simple cases.
 		} else if c == BRANCHSTART {
