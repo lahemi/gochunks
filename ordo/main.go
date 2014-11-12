@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ordo/stack"
+	"github.com/lahemi/stack"
 	"os"
 	"strconv"
 	"strings"
